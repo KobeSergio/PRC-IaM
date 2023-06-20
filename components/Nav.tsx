@@ -22,7 +22,7 @@ export default function Nav() {
       <div className="justify-between px-6 lg:px-12 mx-auto lg:items-center lg:flex">
         <div>
           <div className="flex items-center justify-between py-3 lg:block">
-            <div className="flex flex-row gap-3">
+            <div className="flex flex-row gap-3 items-center">
               <Link href="/">
                 <Image
                   src={"assets/images/prc_logo.svg"}
@@ -32,14 +32,9 @@ export default function Nav() {
                   className="max-md:w-[50px] max-md:h-[50px]"
                 />
               </Link>
-              <div className="flex flex-col justify-center">
-                <h3 className="hidden md:flex font-monts font-medium text-sm text-primaryBlue">
-                  PROFESSIONAL REGULATION COMMISSIONS
-                </h3>
-                <h1 className="hidden md:flex font-monts font-semibold text-xl text-primaryBlue">
-                  ACCREDITATION APPLICATION SYSTEM
-                </h1>
-              </div>
+              <h1 className="font-monts font-semibold text-xl text-primaryBlue">
+                PRC Application Management System
+              </h1>
             </div>
             <div className="lg:hidden">
               <Image
