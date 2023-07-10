@@ -32,7 +32,7 @@ export default function Nav() {
                   className="max-md:w-[50px] max-md:h-[50px]"
                 />
               </Link>
-              <h1 className="font-monts font-semibold text-xl text-primaryBlue">
+              <h1 className="font-monts font-semibold text-base lg:text-xl text-primaryBlue">
                 PRC Application Management System
               </h1>
             </div>
