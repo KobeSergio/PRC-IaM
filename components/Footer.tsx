@@ -5,8 +5,8 @@ export default function Footer() {
   return (
     <footer className="flex flex-col pb-6 bg-[#F9FAFE] px-6 lg:px-12">
       <hr className="bg-[#BDBDBD] h-px "></hr>
-      <div className="flex flex-row justify-between mt-4">
-        <h4 className="font-monts font-semibold text-sm text-[#BDBDBD]">
+      <div className="flex flex-row flex-wrap justify-center lg:justify-between max-lg:gap-2 mt-4">
+        <h4 className="font-monts font-semibold text-sm text-[#BDBDBD] text-center lg:text-start">
           Copyright 2023 © Professional Regulation Commission. All Rights
           Reserved.
         </h4>
