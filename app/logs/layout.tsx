@@ -5,7 +5,7 @@ export const metadata = {
   description: "Thesis keme",
 };
 
-export default function TaskHistoryLayout({
+export default function LogsLayout({
   children,
 }: {
   children: React.ReactNode;
