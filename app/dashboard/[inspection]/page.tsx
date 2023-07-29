@@ -4,6 +4,9 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import CancellationRequest from "@/components/Modals/CancellationRequest";
 import EditInspection from "@/components/Modals/Dashboard/EditInspection";
 import ReschedulingRequest from "@/components/ReschedulingRequest";
+import IMWPR from "@/components/Tasks/IMWPR";
+import NIM from "@/components/Tasks/NIM";
+import PendingWaiting from "@/components/Tasks/PendingWaiting";
 import ScheduleApproval from "@/components/Tasks/ScheduleApproval";
 import { useState, useEffect } from "react";
 import { BsPencil, BsX } from "react-icons/bs";
@@ -94,7 +97,7 @@ export default function Inspection() {
       />
       <div className="min-h-[75vh] w-full flex flex-col gap-5">
         <Breadcrumbs items={breadcrumbItems} />
-        <div className="w-full bg-white border border-[#D5D7D8] flex flex-col rounded-[10px] p-6 gap-5">
+        <div className="w-full bg-white border border-[#D5D7D8] flex flex-col rounded-[10px] p-6 gap-2">
           <div className="flex flex-row justify-between items-center">
             <h1 className="font-monts font-bold text-lg text-darkerGray">
               Inspection Details
@@ -167,6 +170,9 @@ export default function Inspection() {
               </p>
             </div>
           </div>
+          <div className="flex w-full justify-end">
+            <h6 className="font-monts text-sm font-semibold text-darkerGray">Travel/Office Order No.: <span className="text-primaryBlue">#92152613734734</span></h6>
+          </div>
         </div>
         {/* <div className="flex flex-row flex-wrap justify-end gap-2">
         <button
@@ -184,7 +190,7 @@ export default function Inspection() {
           Request for cancellation
         </button>
       </div> */}
-        <ScheduleApproval/>
+        <IMWPR/>
       </div>
     </>
   );
