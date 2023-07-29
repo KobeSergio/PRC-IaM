@@ -1,11 +1,11 @@
 import "../../styles/globals.css";
 
 export const metadata = {
-  title: "PRC Accrediation Application System",
+  title: "PRC Application Management System",
   description: "Thesis keme",
 };
 
-export default function ProfileLayout({
+export default function LogsLayout({
   children,
 }: {
   children: React.ReactNode;

@@ -32,7 +32,7 @@ export default function Nav() {
                   className="max-md:w-[50px] max-md:h-[50px]"
                 />
               </Link>
-              <h1 className="font-monts font-semibold text-xl text-primaryBlue">
+              <h1 className="font-monts font-semibold text-base lg:text-xl text-primaryBlue">
                 PRC Application Management System
               </h1>
             </div>
@@ -56,19 +56,7 @@ export default function Nav() {
               toggle ? "block" : "hidden"
             }`}
           >
-            <ul className="items-center justify-center space-y-8 lg:flex lg:space-x-4 lg:space-y-0">
-              <li className="font-monts font-medium text-sm leading-6 text-darkGray hover:underline underline-offset-4">
-                <Link
-                  href={"https://prc.gov.ph/"}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  PRC Official Webpage
-                </Link>
-              </li>
-              <li className="font-monts font-medium text-sm leading-6 text-darkGray hover:underline underline-offset-4">
-                <Link href={""}>Contact</Link>
-              </li>
+             
               <div>
                 {isLoggedIn ? (
                   <button
@@ -94,7 +82,7 @@ export default function Nav() {
                   </>
                 )}
               </div>
-            </ul>
+            
           </div>
         </div>
       </div>
