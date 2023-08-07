@@ -168,7 +168,7 @@ export default function InspectionCalendar() {
       />
       <AddNewInspection
         isOpen={showAddInspectionModal}
-        setter={handleCloseAddInspectionModal}
+        setter={setShowAddInspectionModal}
         isLoading={isLoading}
         onSubmit={handleSubmitAddInspectionModal}
       />

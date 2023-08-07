@@ -69,12 +69,16 @@ export default function Inspection() {
 
   useEffect(() => {
     const body = document.querySelector("body");
-    if (showEditInspectionModal) {
-      body.style.overflow = "hidden"; // Disable scrolling
-    } else {
-      body.style.overflow = "auto"; // Enable scrolling
+    if (body) {
+      // null check added here
+      if (showEditInspectionModal) {
+        body.style.overflow = "hidden"; // Disable scrolling
+      } else {
+        body.style.overflow = "auto"; // Enable scrolling
+      }
     }
   }, [showEditInspectionModal]);
+
   return (
     <>
       <EditInspection
@@ -171,7 +175,10 @@ export default function Inspection() {
             </div>
           </div>
           <div className="flex w-full justify-end">
-            <h6 className="font-monts text-sm font-semibold text-darkerGray">Travel/Office Order No.: <span className="text-primaryBlue">#92152613734734</span></h6>
+            <h6 className="font-monts text-sm font-semibold text-darkerGray">
+              Travel/Office Order No.:{" "}
+              <span className="text-primaryBlue">#92152613734734</span>
+            </h6>
           </div>
         </div>
         {/* <div className="flex flex-row flex-wrap justify-end gap-2">
@@ -190,7 +197,7 @@ export default function Inspection() {
           Request for cancellation
         </button>
       </div> */}
-        <IMWPR/>
+        <IMWPR />
       </div>
     </>
   );
