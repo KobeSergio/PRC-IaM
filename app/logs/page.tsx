@@ -146,7 +146,7 @@ export default function Logs() {
               {logs.length == 0 ? (
                 <div>
                   <h3 className="font-monts font-medium text-base text-center text-darkerGray">
-                    There are no items to display.
+                    There are no items to display. 
                   </h3>
                 </div>
               ) : (
