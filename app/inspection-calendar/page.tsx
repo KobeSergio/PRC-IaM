@@ -12,11 +12,46 @@ import FilterModal from "@/components/Modals/InspectionCalendar/FilterModal";
 import AddNewInspection from "@/components/Modals/InspectionCalendar/AddNewInspection";
 ChartJS.register(ArcElement);
 
+import { Inspection } from "@/types/Inspection";
+import Firebase from "@/lib/firebase";
+import { useInspections } from "@/contexts/InspectionContext";
+const firebase = new Firebase();
+
+const preInspectionData = {
+  labels: ["Rescheduled", "Cancelled", "Random", "Approved/Additional"],
+  datasets: [
+    {
+      data: [11, 1, 12, 20],
+      backgroundColor: ["#6366F1", "#F59E0B", "#EC4899", "#14B8A6"],
+      hoverBackgroundColor: ["#6366F1", "#F59E0B", "#EC4899", "#14B8A6"],
+    },
+  ],
+};
+
+const postInspectionData = {
+  labels: ["Non-compliant", "For compliance", "Compliant"],
+  datasets: [
+    {
+      data: [17, 24, 20],
+      backgroundColor: ["#DB1131", "#FACC15", "#4F925A"],
+      hoverBackgroundColor: ["#DB1131", "#FACC15", "#4F925A"],
+    },
+  ],
+};
+
+const options = {
+  plugins: {
+    legend: {
+      display: true,
+    },
+  },
+};
+
 export default function InspectionCalendar() {
   const [showFilterModal, setShowFilterModal] = useState(false);
-  const [showAddInspectionModal, setShowAddInspectionModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
+  const { inspections, setInspections } = useInspections();
 
   const handleCloseFilterModal = () => {
     setShowFilterModal(false);
@@ -31,132 +66,14 @@ export default function InspectionCalendar() {
     }, 2000);
   };
 
-  const handleCloseAddInspectionModal = () => {
-    setShowAddInspectionModal(false);
-  };
-  const handleSubmitAddInspectionModal = () => {
-    //insert logic here
-    setIsLoading(true);
-
-    setTimeout(() => {
-      setShowAddInspectionModal(false);
-      setIsLoading(false);
-    }, 2000);
-  };
-
   useEffect(() => {
     const body = document.querySelector("body");
-    if (showFilterModal || showAddInspectionModal) {
-      body.style.overflow = "hidden"; // Disable scrolling
+    if (showFilterModal) {
+      if (body != null) body.style.overflow = "hidden"; // Disable scrolling
     } else {
-      body.style.overflow = "auto"; // Enable scrolling
+      if (body != null) body.style.overflow = "auto"; // Enable scrolling
     }
-  }, [showAddInspectionModal, showFilterModal]);
-
-  const preInspectionData = {
-    labels: ["Rescheduled", "Cancelled", "Random", "Approved/Additional"],
-    datasets: [
-      {
-        data: [11, 1, 12, 20],
-        backgroundColor: ["#6366F1", "#F59E0B", "#EC4899", "#14B8A6"],
-        hoverBackgroundColor: ["#6366F1", "#F59E0B", "#EC4899", "#14B8A6"],
-      },
-    ],
-  };
-
-  const postInspectionData = {
-    labels: ["Non-compliant", "For compliance", "Compliant"],
-    datasets: [
-      {
-        data: [17, 24, 20],
-        backgroundColor: ["#DB1131", "#FACC15", "#4F925A"],
-        hoverBackgroundColor: ["#DB1131", "#FACC15", "#4F925A"],
-      },
-    ],
-  };
-
-  const options = {
-    plugins: {
-      legend: {
-        display: true,
-      },
-    },
-  };
-
-  const inspections: any[] = [
-    {
-      inspection_date: "8/25/2023",
-      name: "Makati Med",
-      type: "Establishment",
-      mode: "Physical",
-      regional_office: "RO NCR",
-      status: "PI: Random",
-      route: "/dashboard/inspection",
-    },
-    {
-      inspection_date: "9/1/2023",
-      name: "Mapua University - Intramuros",
-      type: "HEI",
-      mode: "Physical",
-      regional_office: "RO NCR",
-      status: "PI: Approved",
-      route: "/dashboard/inspection",
-    },
-    {
-      inspection_date: "8/25/2023",
-      name: "University of Santo Tomas",
-      type: "Establishment",
-      mode: "Physical",
-      regional_office: "RO NCR",
-      status: "PO: Compliant",
-      route: "/dashboard/inspection",
-    },
-    {
-      inspection_date: "8/25/2023",
-      name: "Makati Med",
-      type: "Establishment",
-      mode: "Physical",
-      regional_office: "RO NCR",
-      status: "PO: Compliant",
-      route: "/dashboard/inspection",
-    },
-    {
-      inspection_date: "8/25/2023",
-      name: "Makati Med",
-      type: "Establishment",
-      mode: "Physical",
-      regional_office: "RO NCR",
-      status: "PO: Compliant",
-      route: "/dashboard/inspection",
-    },
-    {
-      inspection_date: "8/25/2023",
-      name: "Makati Med",
-      type: "Establishment",
-      mode: "Physical",
-      regional_office: "RO NCR",
-      status: "PO: Compliant",
-      route: "/dashboard/inspection",
-    },
-    {
-      inspection_date: "8/25/2023",
-      name: "Makati Med",
-      type: "Establishment",
-      mode: "Physical",
-      regional_office: "RO NCR",
-      status: "PO: Compliant",
-      route: "/dashboard/inspection",
-    },
-    {
-      inspection_date: "8/25/2023",
-      name: "Makati Med",
-      type: "Establishment",
-      mode: "Physical",
-      regional_office: "RO NCR",
-      status: "PO: Compliant",
-      route: "/dashboard/inspection",
-    },
-  ];
+  }, [showFilterModal]);
 
   return (
     <>
@@ -165,12 +82,6 @@ export default function InspectionCalendar() {
         setter={handleCloseFilterModal}
         isLoading={isLoading}
         onSubmit={handleSubmitFilterModal}
-      />
-      <AddNewInspection
-        isOpen={showAddInspectionModal}
-        setter={setShowAddInspectionModal}
-        isLoading={isLoading}
-        onSubmit={handleSubmitAddInspectionModal}
       />
       <div className="min-h-[75vh] flex flex-col lg:flex-row gap-5">
         <aside className="w-full lg:w-1/4">
@@ -187,7 +98,7 @@ export default function InspectionCalendar() {
                     id="year"
                     aria-label="year"
                   >
-                    <option value="">2023</option>
+                    <option value="2023">2023</option>
                     <option value="2022">2022</option>
                     <option value="2021">2021</option>
                     <option value="2020">2020</option>
@@ -227,15 +138,6 @@ export default function InspectionCalendar() {
                 >
                   Show list
                   <BsList className="flex w-4 h-4 object-contain fill-primaryBlue" />
-                </button>
-
-                <button
-                  type="button"
-                  className="w-full lg:w-fit flex items-center justify-center gap-2 cursor-pointer text-gray border bg-primaryBlue border-primaryBlue rounded-lg font-monts font-semibold text-sm text-white h-fit p-2.5"
-                  onClick={() => setShowAddInspectionModal(true)}
-                >
-                  <BsPlusLg className="flex w-4 h-4 object-contain" />
-                  Add new inspection
                 </button>
               </div>
             </div>
@@ -359,15 +261,6 @@ export default function InspectionCalendar() {
                   Show calendar
                   <BsCalendar3 className="flex w-4 h-4 object-contain fill-primaryBlue" />
                 </button>
-
-                <button
-                  type="button"
-                  className="w-full lg:w-fit flex items-center justify-center gap-2 cursor-pointer text-gray border bg-primaryBlue border-primaryBlue rounded-lg font-monts font-semibold text-sm text-white h-fit p-2.5"
-                  onClick={() => setShowAddInspectionModal(true)}
-                >
-                  <BsPlusLg className="flex w-4 h-4 object-contain" />
-                  Add new inspection
-                </button>
               </div>
             </div>
             <div className="overflow-x-auto w-full h-full bg-white border border-[#D5D7D8] rounded-[10px]">
@@ -417,23 +310,23 @@ export default function InspectionCalendar() {
                           {row.inspection_date}
                         </h3>
                         <h3 className=" col-span-3 font-monts font-semibold text-sm text-darkerGray px-4">
-                          {row.name}
+                          {row.client_details.name}
                         </h3>
                         <h3 className=" col-span-2 font-monts font-semibold text-sm text-center text-darkerGray px-4">
-                          {row.type}
+                          {row.client_details.type}
                         </h3>
                         <h3 className=" col-span-1 font-monts font-semibold text-sm text-center text-darkerGray px-4">
-                          {row.mode}
+                          {row.inspection_mode}
                         </h3>
                         <h3 className=" col-span-2 font-monts font-semibold text-sm text-center text-darkerGray px-4">
-                          {row.regional_office}
+                          {row.ro_details.office}
                         </h3>
                         <h3 className=" col-span-2 font-monts font-semibold text-sm text-center text-darkerGray px-4">
                           {row.status}
                         </h3>
                         <h3 className=" col-span-1 font-monts font-semibold text-sm text-center text-darkerGray px-4 pr-0">
                           <Link
-                            href={row.route}
+                            href={row.inspection_id}
                             className="font-monts font-semibold text-sm text-primaryBlue p-3 pl-0 hover:underline"
                           >
                             View

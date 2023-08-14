@@ -26,13 +26,18 @@ export default function SignIn() {
     if (email && password) {
       setIsLoading(true);
       const response = await firebase.signIn(email, password);
-      if (response === 200) {
+      if (response.status === 200) {
+        //set token to local storage
+        if (response.prb !== undefined) {
+          //set token to local storage
+          localStorage.setItem("prb", JSON.stringify(response.prb));
+        }
         //redirect to dashboard
         router.push("/dashboard");
         setIsLoading(false);
-      } else if (response === 401 || response === 400) {
+      } else if (response.status === 401 || response.status === 400) {
         alert("Invalid credentials");
-      } else if (response === 500) {
+      } else if (response.status === 500) {
         alert("Something went wrong");
       }
       setIsLoading(false);

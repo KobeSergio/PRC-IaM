@@ -25,6 +25,7 @@ import {
 import { Inspection } from "@/types/Inspection";
 import { Client } from "@/types/Client";
 import { RO } from "@/types/RO";
+import { Log } from "@/types/Log";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -59,18 +60,17 @@ export default class Firebase {
       const querySnapshot = await getDocs(q);
       if (querySnapshot.empty) {
         console.log("No matching documents.");
-        return 400;
+        return { status: 400 };
       }
-
       for (const doc of querySnapshot.docs) {
         if (doc.data().password === password) {
-          return 200;
+          return { status: 200, prb: doc.data() };
         }
       }
-      return 401;
+      return { status: 401 };
     } catch (error) {
       console.log(error);
-      return 500;
+      return { status: 500 };
     }
   }
 
@@ -95,14 +95,17 @@ export default class Firebase {
   //GET: Get all inspections.
   //Returns ro list if successful, [] if there is an error.
   async getAllInspections() {
+    //Fetch all inspections
     try {
       const querySnapshot = await getDocs(inspectionsRef);
       const inspections: Inspection[] = [];
       querySnapshot.forEach((doc) => {
         const data = doc.data() as Inspection;
         data.inspection_id = doc.id;
+        console.log(data);
         inspections.push(data);
       });
+
       return inspections;
     } catch (error) {
       console.log(error);
@@ -128,6 +131,24 @@ export default class Firebase {
     }
   }
 
+  //GET: Get all Logs.
+  //Returns log list if successful, [] if there is an error.
+  async getAllLogs() {
+    try {
+      const querySnapshot = await getDocs(collection(db, "logs"));
+      const logs: Log[] = [];
+      querySnapshot.forEach((doc) => {
+        const data = doc.data() as Log;
+        data.log_id = doc.id;
+        logs.push(data);
+      });
+      return logs;
+    } catch (error) {
+      console.log(error);
+      return [];
+    }
+  }
+
   //POST: Create a new inspection.
   //Returns 200 if successful, 400 if there is an error.
   async createInspection(inspectionForm: Inspection) {
@@ -139,10 +160,10 @@ export default class Firebase {
       await updateDoc(docRef, {
         inspection_id: docRef.id,
       });
-      return 200;
+      return { status: 200 };
     } catch (error) {
       console.log(error);
-      return 400;
+      return { status: 400 };
     }
   }
 
@@ -156,10 +177,27 @@ export default class Firebase {
       await updateDoc(docRef, {
         client_id: docRef.id,
       });
-      return 200;
+      return { status: 200 };
     } catch (error) {
       console.log(error);
-      return 400;
+      return { status: 400 };
+    }
+  }
+
+  //POST: Create log
+  //Returns 200 if successful, 400 if there is an error.
+  async createLog(log: Log) {
+    try {
+      const docRef = await addDoc(collection(db, "logs"), {
+        ...log,
+      });
+      await updateDoc(docRef, {
+        log_id: docRef.id,
+      });
+      return { status: 200 };
+    } catch (error) {
+      console.log(error);
+      return { status: 400 };
     }
   }
 }

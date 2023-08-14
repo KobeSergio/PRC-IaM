@@ -9,11 +9,14 @@ import { Pie } from "react-chartjs-2";
 import { RiArrowDownSFill, RiSearchLine } from "react-icons/ri";
 import { BsFunnel, BsX } from "react-icons/bs";
 import FilterModal from "@/components/Modals/Dashboard/FilterModal";
+import { useInspections } from "@/contexts/InspectionContext";
 ChartJS.register(ArcElement);
 
 export default function Dashboard() {
   const [showFilterModal, setShowFilterModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  const { inspections } = useInspections();
 
   const handleCloseFilterModal = () => {
     setShowFilterModal(false);
@@ -31,9 +34,9 @@ export default function Dashboard() {
   useEffect(() => {
     const body = document.querySelector("body");
     if (showFilterModal) {
-      body.style.overflow = "hidden"; // Disable scrolling
+      if (body) body.style.overflow = "hidden"; // Disable scrolling
     } else {
-      body.style.overflow = "auto"; // Enable scrolling
+      if (body) body.style.overflow = "auto"; // Enable scrolling
     }
   }, [showFilterModal]);
 
@@ -55,81 +58,6 @@ export default function Dashboard() {
       },
     },
   };
-
-  const inspections: any[] = [
-    {
-      inspection_date: "8/25/2023",
-      name: "Makati Med",
-      type: "Establishment",
-      mode: "Physical",
-      task: "Scheduling",
-      fulfill_before: "7/6/23",
-      route: "/dashboard/inspection",
-    },
-    {
-      inspection_date: "9/1/2023",
-      name: "Mapua University - Intramuros",
-      type: "HEI",
-      mode: "Physical",
-      task: "NIM",
-      fulfill_before: "7/12/23",
-      route: "/dashboard/inspection",
-    },
-    {
-      inspection_date: "8/25/2023",
-      name: "University of Santo Tomas",
-      type: "Establishment",
-      mode: "Physical",
-      task: "IMWPR",
-      fulfill_before: "7/6/23",
-      route: "/dashboard/inspection",
-    },
-    {
-      inspection_date: "8/25/2023",
-      name: "Makati Med",
-      type: "Establishment",
-      mode: "Physical",
-      task: "Awaiting Approval",
-      fulfill_before: "N/A",
-      route: "/dashboard/inspection",
-    },
-    {
-      inspection_date: "8/25/2023",
-      name: "Makati Med",
-      type: "Establishment",
-      mode: "Physical",
-      task: "Awaiting Approval",
-      fulfill_before: "N/A",
-      route: "/dashboard/inspection",
-    },
-    {
-      inspection_date: "8/25/2023",
-      name: "Makati Med",
-      type: "Establishment",
-      mode: "Physical",
-      task: "Awaiting Approval",
-      fulfill_before: "N/A",
-      route: "/dashboard/inspection",
-    },
-    {
-      inspection_date: "8/25/2023",
-      name: "Makati Med",
-      type: "Establishment",
-      mode: "Physical",
-      task: "Awaiting Approval",
-      fulfill_before: "N/A",
-      route: "/dashboard/inspection",
-    },
-    {
-      inspection_date: "8/25/2023",
-      name: "Makati Med",
-      type: "Establishment",
-      mode: "Physical",
-      task: "Awaiting Approval",
-      fulfill_before: "N/A",
-      route: "/dashboard/inspection",
-    },
-  ];
 
   return (
     <>
@@ -265,9 +193,7 @@ export default function Dashboard() {
               <h3 className="col-span-1 font-monts font-semibold text-sm text-center text-[#5C5C5C] px-4">
                 Fulfill before
               </h3>
-              <h3 className="col-span-1 font-monts font-semibold text-sm text-center text-[#5C5C5C] px-4 pr-0">
-                {""}
-              </h3>
+              <h3 className="col-span-1 font-monts font-semibold text-sm text-center text-[#5C5C5C] px-4 pr-0"></h3>
             </div>
 
             <div className="lg:overflow-y-auto w-full max-h-[25rem]">
@@ -292,23 +218,23 @@ export default function Dashboard() {
                         {row.inspection_date}
                       </h3>
                       <h3 className=" col-span-4 font-monts font-semibold text-sm text-darkerGray px-4">
-                        {row.name}
+                        {row.client_details.name}
                       </h3>
                       <h3 className=" col-span-2 font-monts font-semibold text-sm text-center text-darkerGray px-4">
-                        {row.type}
+                        {row.client_details.type}
                       </h3>
                       <h3 className=" col-span-1 font-monts font-semibold text-sm text-center text-darkerGray px-4">
-                        {row.mode}
+                        {row.inspection_mode}
                       </h3>
                       <h3 className=" col-span-2 font-monts font-semibold text-sm text-center text-darkerGray px-4">
-                        {row.task}
+                        {row.inspection_task}
                       </h3>
                       <h3 className=" col-span-1 font-monts font-semibold text-sm text-center text-darkerGray px-4">
-                        {row.fulfill_before}
+                        {row.inspection_date}
                       </h3>
                       <h3 className=" col-span-1 font-monts font-semibold text-sm text-center text-darkerGray px-4 pr-0">
                         <Link
-                          href={row.route}
+                          href={row.inspection_id}
                           className="font-monts font-semibold text-sm text-primaryBlue p-3 pl-0 hover:underline"
                         >
                           View

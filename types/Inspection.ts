@@ -1,9 +1,11 @@
+import { ACD } from "./ACD";
+import { Client } from "./Client";
+import { OC } from "./OC";
+import { PRB } from "./PRB";
+import { RO } from "./RO";
+
 export type Inspection = {
   inspection_id: string;
-  prb_id: string;
-  ro_id: string;
-  acd_id: string;
-  oc_id: string;
   inspection_task: string;
   inspection_date: string;
   inspection_mode: string;
@@ -13,4 +15,10 @@ export type Inspection = {
   inspection_COC: string;
   createdAt: string;
   fulfilledAt: string;
+  prb_details: PRB;
+  acd_details: ACD;
+  oc_details: OC;
+  client_details: Client;
+  ro_details: RO;
+  status: string;
 };

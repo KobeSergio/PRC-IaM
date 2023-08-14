@@ -7,9 +7,18 @@ import Firebase from "@/lib/firebase";
 import { RO } from "@/types/RO";
 import { Client } from "@/types/Client";
 import { Inspection } from "@/types/Inspection";
+import { ACD } from "@/types/ACD";
+import { OC } from "@/types/OC";
+import { PRB } from "@/types/PRB";
+import { Log } from "@/types/Log";
+
 const firebase = new Firebase();
 
-export default function AddNewInspection({ isOpen, setter, isLoading }: any) {
+export default function AddNewInspection({
+  isOpen,
+  setter,
+  updateInspections,
+}: any) {
   //Loaders
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -23,8 +32,6 @@ export default function AddNewInspection({ isOpen, setter, isLoading }: any) {
   const [mode, setMode] = useState("Virtual");
   const [RO, setRO] = useState("");
   const [client, setClient] = useState("New client");
-
-  console.log(RO);
 
   //New client form values
   const [newClientName, setNewClientName] = useState<string>("");
@@ -59,10 +66,18 @@ export default function AddNewInspection({ isOpen, setter, isLoading }: any) {
 
   //Handle form submission
   const handleSubmit = async () => {
+    //Get prb details from local_storage
+    const prb = JSON.parse(localStorage.getItem("prb") as string) as PRB;
+    if (prb === null || prb === undefined) {
+      alert("Something went wrong, please re-login and try again");
+      return;
+    }
     setIsSubmitting(true);
-
+    //Create new client if client == "New client"
+    let newClient = {};
     if (client == "New client") {
-      const newClient: Client = {
+      //Create new client
+      newClient = {
         client_id: "",
         name: newClientName,
         type: newClientType,
@@ -71,19 +86,19 @@ export default function AddNewInspection({ isOpen, setter, isLoading }: any) {
       };
 
       try {
-        await firebase.createNewClient(newClient);
+        await firebase.createNewClient(newClient as Client);
       } catch (error) {
         console.log(error);
         alert("Client failed to create");
       }
+    } else {
+      //Get client details
+      newClient = clientList.find((c) => c.name == client) as Client;
     }
 
     const inspection: Inspection = {
+      //Inspection files
       inspection_id: "",
-      prb_id: "",
-      ro_id: RO,
-      acd_id: "",
-      oc_id: "",
       inspection_task: "",
       inspection_date: date,
       inspection_mode: mode,
@@ -93,9 +108,27 @@ export default function AddNewInspection({ isOpen, setter, isLoading }: any) {
       inspection_COC: "",
       createdAt: "",
       fulfilledAt: "",
+      //Dependencies
+      client_details: newClient as Client,
+      ro_details: regionalOffices.find((r) => r.ro_id == RO) as RO,
+      prb_details: prb,
+      acd_details: {} as ACD,
+      oc_details: {} as OC,
+      status: "",
     };
+
+    const log: Log = {
+      log_id: "",
+      timestamp: new Date().toLocaleString(),
+      client_details: newClient as Client,
+      author_details: prb,
+      action: "Added new inspection",
+    };
+
     try {
       await firebase.createInspection(inspection);
+      await firebase.createLog(log);
+      updateInspections((prev: Inspection[]) => [...prev, inspection]);
       alert("Inspection created successfully!");
     } catch (error) {
       console.log(error);
@@ -108,6 +141,7 @@ export default function AddNewInspection({ isOpen, setter, isLoading }: any) {
   if (isOpen === false) {
     return <></>;
   }
+
   return (
     <div
       className="fixed z-40 top-0 left-0 right-0 bottom-0 bg-black bg-opacity-50 flex justify-center items-center"
@@ -262,68 +296,70 @@ export default function AddNewInspection({ isOpen, setter, isLoading }: any) {
                   </div>
                 </div>
               </div>
-              <div className="flex flex-col space-y-6 border-t border-solid border-slate-200">
-                <h6 className="mt-6 font-monts font-bold text-sm text-darkerGray">
-                  Register new client
-                </h6>
-                <div className="flex flex-col lg:flex-row gap-6">
-                  <div className="flex flex-col gap-2">
-                    <h6 className="font-monts font-bold text-sm text-darkerGray">
-                      Name
-                    </h6>
-                    <input
-                      type="text"
-                      className="block cursor-pointer appearance-none w-full text-gray border bg-white border-[#D5D7D8] rounded-lg font-monts font-medium text-sm text-[#7C7C7C] h-fit p-2.5 pr-6 outline-none"
-                      onChange={(e) => setNewClientName(e.target.value)}
-                      value={newClientName}
-                    />
-                  </div>
-                  <div className="w-full lg:w-1/4 flex flex-col gap-2">
-                    <h6 className="font-monts font-bold text-sm text-darkerGray">
-                      Type
-                    </h6>
-                    <div className="w-full relative">
-                      <select
+              {client == "New client" && (
+                <div className="flex flex-col space-y-6 border-t border-solid border-slate-200">
+                  <h6 className="mt-6 font-monts font-bold text-sm text-darkerGray">
+                    Register new client
+                  </h6>
+                  <div className="flex flex-col lg:flex-row gap-6">
+                    <div className="flex flex-col gap-2">
+                      <h6 className="font-monts font-bold text-sm text-darkerGray">
+                        Name
+                      </h6>
+                      <input
+                        type="text"
                         className="block cursor-pointer appearance-none w-full text-gray border bg-white border-[#D5D7D8] rounded-lg font-monts font-medium text-sm text-[#7C7C7C] h-fit p-2.5 pr-6 outline-none"
-                        onChange={(e) => setNewClientType(e.target.value)}
-                        value={newClientType}
-                      >
-                        <option value="Establishment">Establishment</option>
-                        <option value="Higher Educational Institution">
-                          Higher Educational Institution
-                        </option>
-                      </select>
-                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                        <RiArrowDownSFill className="flex w-4 h-4 object-contain cursor-pointer" />
+                        onChange={(e) => setNewClientName(e.target.value)}
+                        value={newClientName}
+                      />
+                    </div>
+                    <div className="w-full lg:w-1/4 flex flex-col gap-2">
+                      <h6 className="font-monts font-bold text-sm text-darkerGray">
+                        Type
+                      </h6>
+                      <div className="w-full relative">
+                        <select
+                          className="block cursor-pointer appearance-none w-full text-gray border bg-white border-[#D5D7D8] rounded-lg font-monts font-medium text-sm text-[#7C7C7C] h-fit p-2.5 pr-6 outline-none"
+                          onChange={(e) => setNewClientType(e.target.value)}
+                          value={newClientType}
+                        >
+                          <option value="Establishment">Establishment</option>
+                          <option value="Higher Educational Institution">
+                            Higher Educational Institution
+                          </option>
+                        </select>
+                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                          <RiArrowDownSFill className="flex w-4 h-4 object-contain cursor-pointer" />
+                        </div>
                       </div>
                     </div>
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <h6 className="font-monts font-bold text-sm text-darkerGray">
-                      Email
-                    </h6>
-                    <input
-                      aria-label="email"
-                      type="text"
-                      className="block cursor-pointer appearance-none w-full text-gray border bg-white border-[#D5D7D8] rounded-lg font-monts font-medium text-sm text-[#7C7C7C] h-fit p-2.5 pr-6 outline-none"
-                      onChange={(e) => setNewClientEmail(e.target.value)}
-                      value={newClientEmail}
-                    />
-                  </div>
-                  <div className="w-full lg:w-1/2 flex flex-col gap-2">
-                    <h6 className="font-monts font-bold text-sm text-darkerGray">
-                      Address
-                    </h6>
-                    <input
-                      aria-label="address"
-                      type="text"
-                      className="block cursor-pointer appearance-none w-full text-gray border bg-white border-[#D5D7D8] rounded-lg font-monts font-medium text-sm text-[#7C7C7C] h-fit p-2.5 pr-6 outline-none"
-                      onChange={(e) => setNewClientAddress(e.target.value)}
-                      value={newClientAddress}
-                    />
+                    <div className="flex flex-col gap-2">
+                      <h6 className="font-monts font-bold text-sm text-darkerGray">
+                        Email
+                      </h6>
+                      <input
+                        aria-label="email"
+                        type="text"
+                        className="block cursor-pointer appearance-none w-full text-gray border bg-white border-[#D5D7D8] rounded-lg font-monts font-medium text-sm text-[#7C7C7C] h-fit p-2.5 pr-6 outline-none"
+                        onChange={(e) => setNewClientEmail(e.target.value)}
+                        value={newClientEmail}
+                      />
+                    </div>
+                    <div className="w-full lg:w-1/2 flex flex-col gap-2">
+                      <h6 className="font-monts font-bold text-sm text-darkerGray">
+                        Address
+                      </h6>
+                      <input
+                        aria-label="address"
+                        type="text"
+                        className="block cursor-pointer appearance-none w-full text-gray border bg-white border-[#D5D7D8] rounded-lg font-monts font-medium text-sm text-[#7C7C7C] h-fit p-2.5 pr-6 outline-none"
+                        onChange={(e) => setNewClientAddress(e.target.value)}
+                        value={newClientAddress}
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
             </div>
             {/*footer*/}
             <div className="flex items-center justify-end py-2 p-6 rounded-b">
@@ -335,9 +371,7 @@ export default function AddNewInspection({ isOpen, setter, isLoading }: any) {
                 Cancel
               </button>
               <button
-                className={`${
-                  isLoading ? "flex items-center justify-center gap-0.5" : ""
-                } py-2 px-4 font-monts font-semibold text-sm text-white bg-[#3C6497] rounded-lg outline-none w-fit`}
+                className={`py-2 px-4 font-monts font-semibold text-sm text-white bg-[#3C6497] rounded-lg outline-none w-fit`}
                 type="button"
                 onClick={handleSubmit}
               >
