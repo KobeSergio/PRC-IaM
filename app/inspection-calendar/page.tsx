@@ -9,7 +9,6 @@ import { Pie } from "react-chartjs-2";
 import { RiArrowDownSFill, RiSearchLine } from "react-icons/ri";
 import { BsFunnel, BsCalendar3, BsPlusLg, BsList } from "react-icons/bs";
 import FilterModal from "@/components/Modals/InspectionCalendar/FilterModal";
-import AddNewInspection from "@/components/Modals/InspectionCalendar/AddNewInspection";
 ChartJS.register(ArcElement);
 
 import { Inspection } from "@/types/Inspection";

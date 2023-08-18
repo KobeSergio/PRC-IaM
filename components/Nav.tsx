@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { signIn, signOut, useSession, getProviders } from "next-auth/react";
 import { BsPlusLg } from "react-icons/bs";
-import AddNewInspection from "./Modals/InspectionCalendar/AddNewInspection";
+import AddNewInspection from "./Modals/AddNewInspection";
 import { useInspections } from "@/contexts/InspectionContext";
 
 export default function Nav() {
