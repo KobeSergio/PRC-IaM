@@ -145,7 +145,6 @@ export default function AddNewInspection({
   return (
     <div
       className="fixed z-40 top-0 left-0 right-0 bottom-0 bg-black bg-opacity-50 flex justify-center items-center"
-      onClick={() => setter(false)} // Close the modal when backdrop is clicked
     >
       <div
         className=" overflow-x-hidden overflow-y-auto fixed w-full h-full inset-0 z-50 outline-none focus:outline-none"
