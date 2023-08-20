@@ -11,12 +11,70 @@ import FilterModal from "@/components/Modals/InspectionCalendar/FilterModal";
 ChartJS.register(ArcElement);
 
 import { useInspections } from "@/contexts/InspectionContext";
+import { Inspection } from "@/types/Inspection";
 
 export default function InspectionCalendar() {
   const [showFilterModal, setShowFilterModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
   const { inspections } = useInspections();
+
+  //This is the list of inspections that will be displayed
+  const [filteredInspections, setFilteredInspections] =
+    useState<Inspection[]>(inspections);
+  //Year sorter
+  const currentYear = new Date().getFullYear();
+  const [selectedYear, setSelectedYear] = useState("All" as any); // Default to current year
+  const [years, setYears] = useState([currentYear]);
+
+  //Handler for year filter
+  useEffect(() => {
+    const filteredInspections = inspections.filter(
+      (inspection) =>
+        new Date(inspection.inspection_date).getFullYear() ==
+        parseInt(selectedYear)
+    );
+    setFilteredInspections(filteredInspections);
+  }, [selectedYear]);
+
+  useEffect(() => {
+    if (filteredInspections.length > 0) {
+      const uniqueYears = new Set(
+        inspections.map((inspection) =>
+          new Date(inspection.inspection_date).getFullYear()
+        )
+      );
+      const uniqueYearsArray = Array.from(uniqueYears);
+      setYears([...uniqueYearsArray].sort().reverse());
+    }
+  }, [filteredInspections]);
+
+  //Search filter
+  const [search, setSearch] = useState("");
+  //Handler for search filter
+  useEffect(() => {
+    if (inspections.length > 0) {
+      if (search == "") {
+        if (selectedYear == "All") {
+          setFilteredInspections(inspections);
+        } else {
+          setFilteredInspections(
+            inspections.filter(
+              (inspection) =>
+                new Date(inspection.inspection_date).getFullYear() ==
+                parseInt(selectedYear)
+            )
+          );
+        }
+      } else {
+        const searchFilteredInspections = filteredInspections.filter(
+          (inspection) =>
+            inspection.client_details.name.toLowerCase().includes(search)
+        );
+        setFilteredInspections(searchFilteredInspections);
+      }
+    }
+  }, [search]);
 
   const inspectionsWithTags = inspections.filter(
     (inspection) => inspection.status != "Pending"
@@ -45,7 +103,7 @@ export default function InspectionCalendar() {
   } as any);
 
   useEffect(() => {
-    if (inspectionsWithTags.length == 0) return;
+    if (inspections.length == 0) return;
 
     //Get number of inspections where inspection_status is reschedulled, cancelled, random, approved, additional, non-compliant, for compliance, compliant, and under review from inspections object
     const rescheduledInspections = inspections.filter(
@@ -109,20 +167,6 @@ export default function InspectionCalendar() {
     });
   }, [inspections]);
 
-  const handleCloseFilterModal = () => {
-    setShowFilterModal(false);
-  };
-
-  const handleSubmitFilterModal = () => {
-    //insert logic here
-    setIsLoading(true);
-
-    setTimeout(() => {
-      setShowFilterModal(false);
-      setIsLoading(false);
-    }, 2000);
-  };
-
   useEffect(() => {
     const body = document.querySelector("body");
     if (showFilterModal) {
@@ -136,9 +180,10 @@ export default function InspectionCalendar() {
     <>
       <FilterModal
         isOpen={showFilterModal}
-        setter={handleCloseFilterModal}
+        setter={() => setShowFilterModal(false)}
         isLoading={isLoading}
-        onSubmit={handleSubmitFilterModal}
+        inspections={inspections}
+        setFilteredInspections={setFilteredInspections}
       />
       <div className="min-h-[75vh] flex flex-col lg:flex-row gap-5">
         <aside className="w-full lg:w-1/4">
@@ -154,14 +199,15 @@ export default function InspectionCalendar() {
                     className="block cursor-pointer appearance-none w-fit text-gray border bg-white border-[#D5D7D8] rounded-lg font-monts font-medium text-sm text-[#7C7C7C] h-fit p-2.5 pr-6 outline-none"
                     id="year"
                     aria-label="year"
+                    value={selectedYear}
+                    onChange={(e) => setSelectedYear(e.target.value)}
                   >
-                    <option value="2023">2023</option>
-                    <option value="2022">2022</option>
-                    <option value="2021">2021</option>
-                    <option value="2020">2020</option>
-                    <option value="2019">2019</option>
+                    {years.map((year) => (
+                      <option key={year} value={year}>
+                        {year}
+                      </option>
+                    ))}
                   </select>
-
                   <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
                     <RiArrowDownSFill className="flex w-4 h-4 object-contain cursor-pointer" />
                   </div>
@@ -173,6 +219,7 @@ export default function InspectionCalendar() {
                     id="worker-search"
                     className="pl-10 p-2.5 outline-none bg-white border border-[#D5D7D8] rounded-lg font-monts font-medium text-sm text-gray text-inherit flex w-full"
                     placeholder="Search for a client"
+                    onChange={(e) => setSearch(e.target.value)}
                   />
                 </div>
                 <div className="">
@@ -288,12 +335,14 @@ export default function InspectionCalendar() {
                     className="block cursor-pointer appearance-none w-fit text-gray border bg-white border-[#D5D7D8] rounded-lg font-monts font-medium text-sm text-[#7C7C7C] h-fit p-2.5 pr-6 outline-none"
                     id="year"
                     aria-label="year"
+                    value={selectedYear}
+                    onChange={(e) => setSelectedYear(e.target.value)}
                   >
-                    <option value="">2023</option>
-                    <option value="2022">2022</option>
-                    <option value="2021">2021</option>
-                    <option value="2020">2020</option>
-                    <option value="2019">2019</option>
+                    {years.map((year) => (
+                      <option key={year} value={year}>
+                        {year}
+                      </option>
+                    ))}
                   </select>
 
                   <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
@@ -358,17 +407,17 @@ export default function InspectionCalendar() {
               </div>
 
               <div className="lg:overflow-y-auto w-full max-h-[25rem] justify-center items-center flex">
-                {inspectionsWithTags.length == 0 ? (
+                {filteredInspections.length == 0 ? (
                   <h3 className="font-monts font-medium text-base text-center text-darkerGray">
                     There are no items to display.
                   </h3>
                 ) : (
                   <>
-                    {inspectionsWithTags.map((row, index) => (
+                    {filteredInspections.map((row, index) => (
                       <div
                         key={index}
                         className={`min-w-[1068.8px] grid grid-cols-12 p-6 ${
-                          index < inspectionsWithTags.length - 1
+                          index < filteredInspections.length - 1
                             ? "border-b border-[#BDBDBD] "
                             : "border-none"
                         }  `}

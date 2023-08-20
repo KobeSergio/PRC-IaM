@@ -121,7 +121,7 @@ export default function AddNewInspection({
       timestamp: new Date().toLocaleString(),
       client_details: newClient as Client,
       author_details: prb,
-      action: "Added new inspection",
+      action: "Added new inspection for the year " + date.split("/")[2],
       author_type: "",
       author_id: "",
     };
@@ -146,9 +146,7 @@ export default function AddNewInspection({
   }
 
   return (
-    <div
-      className="fixed z-40 top-0 left-0 right-0 bottom-0 bg-black bg-opacity-50 flex justify-center items-center"
-    >
+    <div className="fixed z-40 top-0 left-0 right-0 bottom-0 bg-black bg-opacity-50 flex justify-center items-center">
       <div
         className=" overflow-x-hidden overflow-y-auto fixed w-full h-full inset-0 z-50 outline-none focus:outline-none"
         // Stop propagation of click events from modal content to backdrop
@@ -231,11 +229,17 @@ export default function AddNewInspection({
                         onChange={(e) => setRO(e.target.value)}
                         value={RO}
                       >
-                        {regionalOffices.map(({ ro_id, office }) => (
-                          <option key={ro_id} value={ro_id}>
-                            {office}
-                          </option>
-                        ))}
+                        {regionalOffices //Sort regionalOffices by office name
+                          .sort((a, b) =>
+                            a.office
+                              .toLowerCase()
+                              .localeCompare(b.office.toLowerCase())
+                          )
+                          .map(({ ro_id, office }) => (
+                            <option key={ro_id} value={ro_id}>
+                              {office}
+                            </option>
+                          ))}
                       </select>
 
                       <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
@@ -257,11 +261,17 @@ export default function AddNewInspection({
                       value={client}
                     >
                       <option value="New client">New HEI/Institution</option>
-                      {clientList.map(({ client_id, name }) => (
-                        <option key={client_id} value={name}>
-                          {name}
-                        </option>
-                      ))}
+                      {clientList
+                        .sort((a, b) =>
+                          a.name
+                            .toLowerCase()
+                            .localeCompare(b.name.toLowerCase())
+                        )
+                        .map(({ client_id, name }) => (
+                          <option key={client_id} value={name}>
+                            {name}
+                          </option>
+                        ))}
                     </select>
 
                     <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">

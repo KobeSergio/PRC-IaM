@@ -6,6 +6,6 @@ export type Log = {
   client_details: Client;
   author_type: string;
   author_id: string;
-  author_details: {};
+  author_details: any;
   action: string;
 };

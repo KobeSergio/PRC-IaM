@@ -43,8 +43,6 @@ export default function FilterModal({
         (checkboxState.scheduling &&
           inspection.inspection_task === "Scheduling - PRB") ||
         (checkboxState.NIM && inspection.inspection_task === "NIM") ||
-        // This seems to be a duplicate condition for NIM. I'm not sure if "VS" was intended to be another checkbox or not.
-        // I'm keeping it here for now. If "VS" is not a valid condition, you can remove this line.
         (checkboxState.VS && inspection.inspection_task === "VS") ||
         (checkboxState.IMWPR && inspection.inspection_task === "IMWPR")
       ) {
