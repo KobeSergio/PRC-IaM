@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
-import { BsGrid, BsCalendar3, BsBook} from "react-icons/bs";
+import { BsGrid, BsCalendar3, BsBook, BsBoxArrowInLeft} from "react-icons/bs";
 
 export default function Sidebar() {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -46,7 +46,7 @@ export default function Sidebar() {
   }, []);
 
   return (
-    <div className="min-h-full px-6 py-10 flex flex-col justify-center items-center bg-white border border-[#D5D7D8] rounded-[10px]">
+    <div className="w-full lg:w-[250px] min-h-full px-6 py-10 flex flex-col justify-start items-center bg-white border border-[#D5D7D8] rounded-[10px]">
       <h3 className="font-monts font-medium text-base text-darkerGray">
         Welcome back, <span className="text-primaryBlue">PRB 1</span>
       </h3>
@@ -76,6 +76,13 @@ export default function Sidebar() {
             </Link>
           );
         })}
+        <Link
+          href="/"
+          className="flex items-center pl-4 pr-2 py-3 font-monts font-semibold text-sm rounded-[10px] cursor-pointer text-darkGray hover:bg-lightestGray"
+        >
+          <BsBoxArrowInLeft />
+          <span className="ml-3">Logout</span>
+        </Link>
       </div>
     </div>
   );

@@ -113,7 +113,7 @@ export default function Logs() {
 
           <div className="overflow-x-auto w-full h-full bg-white border border-[#D5D7D8] rounded-[10px]">
             <div className="min-w-[1068.8px] grid grid-cols-12 border-b border-[#BDBDBD] p-6">
-              <h3 className="col-span-2 font-monts font-semibold text-sm text-start text-[#5C5C5C] px-4 pl-0">
+              <h3 className="col-span-3 font-monts font-semibold text-sm text-start text-[#5C5C5C] px-4 pl-0">
                 Timestamp
               </h3>
               <h3 className="col-span-3 font-monts font-semibold text-sm text-start text-[#5C5C5C] px-4">
@@ -122,7 +122,7 @@ export default function Logs() {
               <h3 className="col-span-2 font-monts font-semibold text-sm text-start text-[#5C5C5C] px-4">
                 Author
               </h3>
-              <h3 className="col-span-5 font-monts font-semibold text-sm text-start text-[#5C5C5C] px-4">
+              <h3 className="col-span-4 font-monts font-semibold text-sm text-start text-[#5C5C5C] px-4">
                 Action
               </h3>
             </div>
@@ -145,7 +145,7 @@ export default function Logs() {
                           : "border-none"
                       }  `}
                     >
-                      <h3 className=" col-span-2 font-monts font-semibold text-sm text-darkerGray px-4 pl-0">
+                      <h3 className=" col-span-3 font-monts font-semibold text-sm text-darkerGray px-4 pl-0">
                         {row.timestamp}
                       </h3>
                       <h3 className=" col-span-3 font-monts font-semibold text-sm text-darkerGray px-4">
@@ -154,7 +154,7 @@ export default function Logs() {
                       <h3 className=" col-span-2 font-monts font-semibold text-sm text-start text-darkerGray px-4">
                         {row.client_details.name}
                       </h3>
-                      <h3 className=" col-span-5 font-monts font-semibold text-sm text-start text-darkerGray px-4">
+                      <h3 className=" col-span-4 font-monts font-semibold text-sm text-start text-darkerGray px-4">
                         {row.action}
                       </h3>
                     </div>
