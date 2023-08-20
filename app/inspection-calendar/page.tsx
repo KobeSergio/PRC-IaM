@@ -1,7 +1,6 @@
 "use client";
 
 import Sidebar from "@/components/Sidebar";
-import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { Chart as ChartJS, ArcElement } from "chart.js";
@@ -9,53 +8,111 @@ import { Pie } from "react-chartjs-2";
 import { RiArrowDownSFill, RiSearchLine } from "react-icons/ri";
 import { BsFunnel, BsCalendar3, BsPlusLg, BsList } from "react-icons/bs";
 import FilterModal from "@/components/Modals/InspectionCalendar/FilterModal";
-import AddNewInspection from "@/components/Modals/InspectionCalendar/AddNewInspection";
 ChartJS.register(ArcElement);
 
-import { Inspection } from "@/types/Inspection";
-import Firebase from "@/lib/firebase";
 import { useInspections } from "@/contexts/InspectionContext";
-const firebase = new Firebase();
-
-const preInspectionData = {
-  labels: ["Rescheduled", "Cancelled", "Random", "Approved/Additional"],
-  datasets: [
-    {
-      data: [11, 1, 12, 20],
-      backgroundColor: ["#6366F1", "#F59E0B", "#EC4899", "#14B8A6"],
-      hoverBackgroundColor: ["#6366F1", "#F59E0B", "#EC4899", "#14B8A6"],
-    },
-  ],
-};
-
-const postInspectionData = {
-  labels: ["Non-compliant", "For compliance", "Compliant"],
-  datasets: [
-    {
-      data: [17, 24, 20],
-      backgroundColor: ["#DB1131", "#FACC15", "#4F925A"],
-      hoverBackgroundColor: ["#DB1131", "#FACC15", "#4F925A"],
-    },
-  ],
-};
-
-const options = {
-  plugins: {
-    legend: {
-      display: true,
-    },
-  },
-};
 
 export default function InspectionCalendar() {
   const [showFilterModal, setShowFilterModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
-  const { inspections, setInspections } = useInspections();
+  const { inspections } = useInspections();
+
+  const inspectionsWithTags = inspections.filter(
+    (inspection) => inspection.status != "Pending"
+  );
+
+  const [preInspectionData, setPreInspectionData] = useState({
+    labels: ["Rescheduled", "Cancelled", "Random", "Approved/Additional"],
+    datasets: [
+      {
+        data: [0, 0, 0, 0],
+        backgroundColor: ["#6366F1", "#F59E0B", "#EC4899", "#14B8A6"],
+        hoverBackgroundColor: ["#6366F1", "#F59E0B", "#EC4899", "#14B8A6"],
+      },
+    ],
+  } as any);
+
+  const [postInspectionData, setPostInspectionData] = useState({
+    labels: ["Non-compliant", "For compliance", "Compliant"],
+    datasets: [
+      {
+        data: [0, 0, 0],
+        backgroundColor: ["#DB1131", "#FACC15", "#4F925A"],
+        hoverBackgroundColor: ["#DB1131", "#FACC15", "#4F925A"],
+      },
+    ],
+  } as any);
+
+  useEffect(() => {
+    if (inspectionsWithTags.length == 0) return;
+
+    //Get number of inspections where inspection_status is reschedulled, cancelled, random, approved, additional, non-compliant, for compliance, compliant, and under review from inspections object
+    const rescheduledInspections = inspections.filter(
+      (inspection) => inspection.status == "Rescheduled"
+    );
+    const cancelledInspections = inspections.filter(
+      (inspection) => inspection.status == "Cancelled"
+    );
+    const randomInspections = inspections.filter(
+      (inspection) => inspection.status == "Random"
+    );
+    const approvedInspections = inspections.filter(
+      (inspection) => inspection.status == "Approved"
+    );
+    const additionalInspections = inspections.filter(
+      (inspection) => inspection.status == "Additional"
+    );
+    const nonCompliantInspections = inspections.filter(
+      (inspection) => inspection.status == "Non-compliant"
+    );
+    const forComplianceInspections = inspections.filter(
+      (inspection) => inspection.status == "For compliance"
+    );
+    const compliantInspections = inspections.filter(
+      (inspection) => inspection.status == "Compliant"
+    );
+    const underReviewInspections = inspections.filter(
+      (inspection) => inspection.status == "Under review"
+    );
+
+    setPreInspectionData({
+      labels: ["Rescheduled", "Cancelled", "Random", "Approved/Additional"],
+      datasets: [
+        {
+          data: [
+            rescheduledInspections.length,
+            cancelledInspections.length,
+            randomInspections.length,
+            approvedInspections.length + additionalInspections.length,
+          ],
+          backgroundColor: ["#6366F1", "#F59E0B", "#EC4899", "#14B8A6"],
+          hoverBackgroundColor: ["#6366F1", "#F59E0B", "#EC4899", "#14B8A6"],
+        },
+      ],
+    });
+
+    setPostInspectionData({
+      labels: ["Under Review", "Non-compliant", "For compliance", "Compliant"],
+      datasets: [
+        {
+          data: [
+            underReviewInspections.length,
+            nonCompliantInspections.length,
+            forComplianceInspections.length,
+            compliantInspections.length,
+          ],
+          backgroundColor: ["#A6123B", "#DB1131", "#FACC15", "#4F925A"],
+          hoverBackgroundColor: ["#DB1131", "#DB1131", "#FACC15", "#4F925A"],
+        },
+      ],
+    });
+  }, [inspections]);
 
   const handleCloseFilterModal = () => {
     setShowFilterModal(false);
   };
+
   const handleSubmitFilterModal = () => {
     //insert logic here
     setIsLoading(true);
@@ -153,7 +210,7 @@ export default function InspectionCalendar() {
                     <p className="font-monts font-bold text-sm text-darkerGray">
                       Pre-Inspection:
                     </p>
-                    {preInspectionData.labels.map((label, index) => (
+                    {preInspectionData.labels.map((label: any, index: any) => (
                       <div
                         key={label}
                         style={{
@@ -173,7 +230,13 @@ export default function InspectionCalendar() {
                 <div className="w-2/5 flex flex-col items-center">
                   <Pie
                     data={preInspectionData}
-                    options={options}
+                    options={{
+                      plugins: {
+                        legend: {
+                          display: true,
+                        },
+                      },
+                    }}
                     width={10}
                     height={10}
                   />
@@ -185,7 +248,7 @@ export default function InspectionCalendar() {
                     <p className="font-monts font-bold text-sm text-darkerGray">
                       Post-Inspection:
                     </p>
-                    {postInspectionData.labels.map((label, index) => (
+                    {postInspectionData.labels.map((label: any, index: any) => (
                       <div
                         key={label}
                         style={{
@@ -205,7 +268,13 @@ export default function InspectionCalendar() {
                 <div className="w-2/5 flex flex-col items-center">
                   <Pie
                     data={postInspectionData}
-                    options={options}
+                    options={{
+                      plugins: {
+                        legend: {
+                          display: true,
+                        },
+                      },
+                    }}
                     width={10}
                     height={10}
                   />
@@ -288,20 +357,18 @@ export default function InspectionCalendar() {
                 </h3>
               </div>
 
-              <div className="lg:overflow-y-auto w-full max-h-[25rem]">
-                {inspections.length == 0 ? (
-                  <div>
-                    <h3 className="font-monts font-medium text-base text-center text-darkerGray">
-                      There are no items to display.
-                    </h3>
-                  </div>
+              <div className="lg:overflow-y-auto w-full max-h-[25rem] justify-center items-center flex">
+                {inspectionsWithTags.length == 0 ? (
+                  <h3 className="font-monts font-medium text-base text-center text-darkerGray">
+                    There are no items to display.
+                  </h3>
                 ) : (
                   <>
-                    {inspections.map((row, index) => (
+                    {inspectionsWithTags.map((row, index) => (
                       <div
                         key={index}
                         className={`min-w-[1068.8px] grid grid-cols-12 p-6 ${
-                          index < inspections.length - 1
+                          index < inspectionsWithTags.length - 1
                             ? "border-b border-[#BDBDBD] "
                             : "border-none"
                         }  `}
@@ -326,7 +393,7 @@ export default function InspectionCalendar() {
                         </h3>
                         <h3 className=" col-span-1 font-monts font-semibold text-sm text-center text-darkerGray px-4 pr-0">
                           <Link
-                            href={row.inspection_id}
+                            href={"inspection/" + row.inspection_id}
                             className="font-monts font-semibold text-sm text-primaryBlue p-3 pl-0 hover:underline"
                           >
                             View

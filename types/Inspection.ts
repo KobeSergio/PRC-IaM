@@ -13,6 +13,7 @@ export type Inspection = {
   inspection_VS: string;
   inspection_IMWPR: string;
   inspection_COC: string;
+  inspection_TO: string;
   createdAt: string;
   fulfilledAt: string;
   prb_details: PRB;

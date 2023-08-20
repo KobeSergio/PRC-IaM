@@ -8,6 +8,8 @@ import { Inspection } from "@/types/Inspection";
 import { InspectionContext } from "@/contexts/InspectionContext";
 import { useEffect, useState } from "react";
 import Firebase from "@/lib/firebase";
+import { LogContext } from "@/contexts/LogContext";
+import { Log } from "@/types/Log";
 const firebase = new Firebase();
 
 type InspectionProviderProps = {
@@ -48,6 +50,35 @@ export const InspectionProvider: React.FC<InspectionProviderProps> = ({
   );
 };
 
+type LogProviderProps = {
+  children: React.ReactNode;
+};
+
+export const LogProvider: React.FC<LogProviderProps> = ({ children }) => {
+  //Declare contexts here (Inspections and prb from local storage)
+  const [logs, setLogs] = useState<Log[]>([]);
+
+  useEffect(() => {
+    if (logs.length == 0) {
+      firebase
+        .getAllLogs()
+        .then((data) => {
+          if (data == null) return;
+          setLogs(data);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
+  }, []);
+
+  return (
+    <LogContext.Provider value={{ logs, setLogs }}>
+      {children}
+    </LogContext.Provider>
+  );
+};
+
 export default function RootLayout({
   children,
 }: {
@@ -58,9 +89,11 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <InspectionProvider>
-          {pathname !== "/" && <Nav />}
-          <main className="">{children}</main>
-          {pathname !== "/" && <Footer />}
+          <LogProvider>
+            {pathname !== "/" && <Nav />}
+            <main className="">{children}</main>
+            {pathname !== "/" && <Footer />}
+          </LogProvider>
         </InspectionProvider>
       </body>
     </html>

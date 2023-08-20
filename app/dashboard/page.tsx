@@ -10,6 +10,10 @@ import { RiArrowDownSFill, RiSearchLine } from "react-icons/ri";
 import { BsFunnel, BsX } from "react-icons/bs";
 import FilterModal from "@/components/Modals/Dashboard/FilterModal";
 import { useInspections } from "@/contexts/InspectionContext";
+import { useLogs } from "@/contexts/LogContext";
+import { PRB } from "@/types/PRB";
+import { Log } from "@/types/Log";
+import { Inspection } from "@/types/Inspection";
 ChartJS.register(ArcElement);
 
 export default function Dashboard() {
@@ -17,19 +21,140 @@ export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(false);
 
   const { inspections } = useInspections();
+  const { logs } = useLogs();
 
-  const handleCloseFilterModal = () => {
-    setShowFilterModal(false);
-  };
-  const handleSubmitFilterModal = () => {
-    //insert logic here
-    setIsLoading(true);
+  //This is the list of inspections that will be displayed
+  const [filteredInspections, setFilteredInspections] =
+    useState<Inspection[]>(inspections);
+  const [filteredLogs, setFilteredLogs] = useState<Log[]>(logs);
 
-    setTimeout(() => {
-      setShowFilterModal(false);
-      setIsLoading(false);
-    }, 2000);
-  };
+  //Year sorter
+  const currentYear = new Date().getFullYear();
+  const [selectedYear, setSelectedYear] = useState("All" as any); // Default to current year
+  const [years, setYears] = useState([currentYear]);
+
+  //Handler for year filter
+  useEffect(() => {
+    if (selectedYear == "All") {
+      setFilteredInspections(inspections);
+      setFilteredLogs(logs);
+    } else {
+      const filteredInspections = inspections.filter(
+        (inspection) =>
+          new Date(inspection.inspection_date).getFullYear() ==
+          parseInt(selectedYear)
+      );
+      setFilteredInspections(filteredInspections);
+
+      //Filtered logs also
+      const filteredLogs = logs.filter(
+        (log) => new Date(log.timestamp).getFullYear() == parseInt(selectedYear)
+      );
+      setFilteredLogs(filteredLogs);
+    }
+  }, [selectedYear]);
+
+  //Get number of inspections where inspection_task is Scheduling, NIM, VS, and IMWPR
+  const [scheduling, setScheduling] = useState(0);
+  const [nim, setNim] = useState(0);
+  const [vs, setVs] = useState(0);
+  const [imwpr, setImwpr] = useState(0);
+
+  useEffect(() => {
+    if (filteredInspections.length > 0) {
+      const _scheduling = filteredInspections.filter(
+        (inspection) => inspection.inspection_task == "Scheduling"
+      ).length;
+      const _nim = filteredInspections.filter(
+        (inspection) => inspection.inspection_task == "NIM"
+      ).length;
+      const _vs = filteredInspections.filter(
+        (inspection) => inspection.inspection_task == "VS"
+      ).length;
+      const _imwpr = filteredInspections.filter(
+        (inspection) => inspection.inspection_task == "IMWPR"
+      ).length;
+
+      setScheduling(_scheduling);
+      setNim(_nim);
+      setVs(_vs);
+      setImwpr(_imwpr);
+
+      const uniqueYears = new Set(
+        inspections.map((inspection) =>
+          new Date(inspection.inspection_date).getFullYear()
+        )
+      );
+      const uniqueYearsArray = Array.from(uniqueYears);
+      setYears([...uniqueYearsArray].sort().reverse());
+    }
+  }, [filteredInspections]);
+
+  //Get number of logs where author_id is the current user
+  const [pieData, setPieData] = useState({
+    labels: ["Accomplished", "Missed"],
+    datasets: [
+      {
+        data: [0, 0],
+        backgroundColor: ["#4F925A", "#973C3C"],
+        hoverBackgroundColor: ["#4F925A", "#973C3C"],
+      },
+    ],
+  } as any);
+
+  useEffect(() => {
+    if (logs.length != 0) {
+      const user = JSON.parse(localStorage.getItem("prb") as string) as PRB;
+      const _logs = logs.filter((log) => log.author_id == user.prb_id);
+
+      const accomplished = _logs.filter((log) =>
+        log.action.includes("Accomplished")
+      ).length;
+      const missed = _logs.filter((log) =>
+        log.action.includes("Missed")
+      ).length;
+
+      const pieData = {
+        labels: ["Accomplished", "Missed"],
+        datasets: [
+          {
+            data: [accomplished, missed],
+            backgroundColor: ["#4F925A", "#973C3C"],
+            hoverBackgroundColor: ["#4F925A", "#973C3C"],
+          },
+        ],
+      };
+      setPieData(pieData);
+    }
+  }, [logs]);
+
+  //Search filter
+  const [search, setSearch] = useState("");
+
+  //Handler for search filter
+  useEffect(() => {
+    if (inspections.length > 0) {
+      if (search == "") {
+        if (selectedYear == "All") {
+          setFilteredInspections(inspections);
+        } else {
+          setFilteredInspections(
+            inspections.filter(
+              (inspection) =>
+                new Date(inspection.inspection_date).getFullYear() ==
+                parseInt(selectedYear)
+            )
+          );
+        }
+      } else {
+        const searchFilteredInspections = filteredInspections.filter(
+          (inspection) =>
+            inspection.client_details.name.toLowerCase().includes(search)
+        );
+        setFilteredInspections(searchFilteredInspections);
+      }
+    }
+  }, [search]);
 
   useEffect(() => {
     const body = document.querySelector("body");
@@ -40,32 +165,14 @@ export default function Dashboard() {
     }
   }, [showFilterModal]);
 
-  const data = {
-    labels: ["Accomplished", "Missed", "Target"],
-    datasets: [
-      {
-        data: [11, 1, 12],
-        backgroundColor: ["#4F925A", "#973C3C", "#404040"],
-        hoverBackgroundColor: ["#4F925A", "#973C3C", "#404040"],
-      },
-    ],
-  };
-
-  const options = {
-    plugins: {
-      legend: {
-        display: true,
-      },
-    },
-  };
-
   return (
     <>
       <FilterModal
         isOpen={showFilterModal}
-        setter={handleCloseFilterModal}
+        setter={() => setShowFilterModal(false)}
         isLoading={isLoading}
-        onSubmit={handleSubmitFilterModal}
+        inspections={inspections}
+        setFilteredInspections={setFilteredInspections}
       />
       <div className="min-h-[75vh] flex flex-col lg:flex-row gap-5">
         <aside className="w-full lg:w-1/4">
@@ -79,7 +186,7 @@ export default function Dashboard() {
                   PRB Tasks
                 </h1>
                 <h3 className="font-monts font-semibold text-base text-darkerGray">
-                  2 total,{" "}
+                  {scheduling + nim + vs + imwpr} total,{" "}
                   <span className="font-medium">proceed to resolve them</span>
                 </h3>
                 <div className="w-full flex flex-row justify-between gap-5 mt-5">
@@ -89,11 +196,17 @@ export default function Dashboard() {
                     </h6>
                     <div className="flex flex-row justify-between font-monts text-sm">
                       <p className="font-medium">Scheduling</p>
-                      <p className="font-semibold">1</p>
+                      <p className="font-semibold">{scheduling}</p>
                     </div>
                     <div className="flex flex-row justify-between font-monts text-sm">
-                      <p className="font-medium">NIM</p>
-                      <p className="font-semibold">1</p>
+                      <p className="font-medium">
+                        Notice of Inspection and Monitoring (NIM)
+                      </p>
+                      <p className="font-semibold">{nim}</p>
+                    </div>
+                    <div className="flex flex-row justify-between font-monts text-sm">
+                      <p className="font-medium">Verification Statement (VS)</p>
+                      <p className="font-semibold">{vs}</p>
                     </div>
                   </div>
                   <div className="w-1/2 flex flex-col gap-3">
@@ -102,7 +215,7 @@ export default function Dashboard() {
                     </h6>
                     <div className="flex flex-row justify-between font-monts text-sm">
                       <p className="font-medium">IMWPR</p>
-                      <p className="font-semibold">1</p>
+                      <p className="font-semibold">{imwpr}</p>
                     </div>
                   </div>
                 </div>
@@ -117,20 +230,45 @@ export default function Dashboard() {
                   Total number of task delivered
                 </h3>
                 <div className="space-y-3 mt-5">
-                  {data.labels.map((label, index) => (
+                  {pieData.labels.map((label: any, index: any) => (
                     <div
                       key={label}
-                      style={{ color: data.datasets[0].backgroundColor[index] }}
+                      style={{
+                        color: pieData.datasets[0].backgroundColor[index],
+                      }}
                       className="font-monts text-sm flex justify-between font-semibold"
                     >
                       <h6>{label}</h6>
-                      <p>{data.datasets[0].data[index]}</p>
+                      <p>{pieData.datasets[0].data[index]}</p>
                     </div>
                   ))}
+                  <div className="font-monts text-sm flex justify-between font-semibold">
+                    <h6>Target</h6>
+                    <p>
+                      {
+                        //Get total number of tasks
+                        pieData.datasets[0].data.reduce(
+                          (a: any, b: any) => a + b,
+                          0
+                        )
+                      }
+                    </p>
+                  </div>
                 </div>
               </div>
               <div className="w-2/5 flex flex-col items-center">
-                <Pie data={data} options={options} width={10} height={10} />
+                <Pie
+                  data={pieData}
+                  options={{
+                    plugins: {
+                      legend: {
+                        display: true,
+                      },
+                    },
+                  }}
+                  width={10}
+                  height={10}
+                />
               </div>
             </div>
           </div>
@@ -140,14 +278,16 @@ export default function Dashboard() {
                 className="block cursor-pointer appearance-none w-fit text-gray border bg-white border-[#D5D7D8] rounded-lg font-monts font-medium text-sm text-[#7C7C7C] h-fit p-2.5 pr-6 outline-none"
                 id="year"
                 aria-label="year"
+                value={selectedYear}
+                onChange={(e) => setSelectedYear(e.target.value)}
               >
-                <option value="">2023</option>
-                <option value="2022">2022</option>
-                <option value="2021">2021</option>
-                <option value="2020">2020</option>
-                <option value="2019">2019</option>
+                <option value={"All"}>All</option>
+                {years.map((year) => (
+                  <option key={year} value={year}>
+                    {year}
+                  </option>
+                ))}
               </select>
-
               <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
                 <RiArrowDownSFill className="flex w-4 h-4 object-contain cursor-pointer" />
               </div>
@@ -159,6 +299,7 @@ export default function Dashboard() {
                 id="worker-search"
                 className="pl-10 p-2.5 outline-none bg-white border border-[#D5D7D8] rounded-lg font-monts font-medium text-sm text-gray text-inherit flex w-full"
                 placeholder="Search for an establishment/HEI.."
+                onChange={(e) => setSearch(e.target.value)}
               />
             </div>
             <div className="">
@@ -197,7 +338,7 @@ export default function Dashboard() {
             </div>
 
             <div className="lg:overflow-y-auto w-full max-h-[25rem]">
-              {inspections.length == 0 ? (
+              {filteredInspections.length == 0 ? (
                 <div>
                   <h3 className="font-monts font-medium text-base text-center text-darkerGray">
                     There are no items to display.
@@ -205,11 +346,11 @@ export default function Dashboard() {
                 </div>
               ) : (
                 <>
-                  {inspections.map((row, index) => (
+                  {filteredInspections.map((row, index) => (
                     <div
                       key={index}
                       className={`min-w-[1068.8px] grid grid-cols-12 p-6 ${
-                        index < inspections.length - 1
+                        index < filteredInspections.length - 1
                           ? "border-b border-[#BDBDBD] "
                           : "border-none"
                       }  `}
@@ -234,7 +375,7 @@ export default function Dashboard() {
                       </h3>
                       <h3 className=" col-span-1 font-monts font-semibold text-sm text-center text-darkerGray px-4 pr-0">
                         <Link
-                          href={row.inspection_id}
+                          href={"inspection/" + row.inspection_id}
                           className="font-monts font-semibold text-sm text-primaryBlue p-3 pl-0 hover:underline"
                         >
                           View

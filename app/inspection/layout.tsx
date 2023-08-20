@@ -5,7 +5,7 @@ export const metadata = {
   description: "",
 };
 
-export default function DashboardLayout({
+export default function InspectionLayout({
   children,
 }: {
   children: React.ReactNode;

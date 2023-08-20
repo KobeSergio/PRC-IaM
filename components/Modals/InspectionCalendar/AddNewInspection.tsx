@@ -12,13 +12,13 @@ import { OC } from "@/types/OC";
 import { PRB } from "@/types/PRB";
 import { Log } from "@/types/Log";
 
-const firebase = new Firebase();
-
 export default function AddNewInspection({
   isOpen,
   setter,
   updateInspections,
 }: any) {
+  const firebase = new Firebase();
+
   //Loaders
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -85,28 +85,27 @@ export default function AddNewInspection({
         address: newClientAddress,
       };
 
-      try {
-        await firebase.createNewClient(newClient as Client);
-      } catch (error) {
+      await firebase.createNewClient(newClient as Client).catch((error) => {
         console.log(error);
         alert("Client failed to create");
-      }
+      });
     } else {
-      //Get client details
+      //Get newClient details
       newClient = clientList.find((c) => c.name == client) as Client;
     }
 
     const inspection: Inspection = {
       //Inspection files
       inspection_id: "",
-      inspection_task: "",
+      inspection_task: "Scheduling - RO",
       inspection_date: date,
       inspection_mode: mode,
       inspection_IMAT: "",
       inspection_VS: "",
       inspection_IMWPR: "",
       inspection_COC: "",
-      createdAt: "",
+      inspection_TO: "",
+      createdAt: new Date().toLocaleString(),
       fulfilledAt: "",
       //Dependencies
       client_details: newClient as Client,
@@ -114,7 +113,7 @@ export default function AddNewInspection({
       prb_details: prb,
       acd_details: {} as ACD,
       oc_details: {} as OC,
-      status: "",
+      status: "Pending",
     };
 
     const log: Log = {
@@ -123,17 +122,21 @@ export default function AddNewInspection({
       client_details: newClient as Client,
       author_details: prb,
       action: "Added new inspection",
+      author_type: "",
+      author_id: "",
     };
 
-    try {
-      await firebase.createInspection(inspection);
-      await firebase.createLog(log);
-      updateInspections((prev: Inspection[]) => [...prev, inspection]);
-      alert("Inspection created successfully!");
-    } catch (error) {
-      console.log(error);
-      alert("Inspection failed to create");
+    const inspection_status = await firebase.createInspection(inspection);
+    const log_status = await firebase.createLog(log, prb.prb_id);
+
+    if (inspection_status.status !== 200 || log_status.status !== 200) {
+      alert("Something went wrong, please try again");
+      setIsSubmitting(false);
+      return;
     }
+    updateInspections((prev: Inspection[]) => [...prev, inspection]);
+    alert("Inspection created successfully!");
+
     setter(false);
     setIsSubmitting(false);
   };
@@ -183,35 +186,7 @@ export default function AddNewInspection({
                 <div className="flex flex-col lg:flex-row gap-6">
                   <div className="w-full lg:w-1/2 flex gap-2 items-center">
                     <h6 className="w-1/2 font-monts font-bold text-sm text-darkerGray">
-                      Inspection Year
-                    </h6>
-                    <div className="w-full relative">
-                      <select
-                        className="block cursor-pointer appearance-none w-full text-gray border bg-white border-[#D5D7D8] rounded-lg font-monts font-medium text-sm text-[#7C7C7C] h-fit p-2.5 pr-6 outline-none"
-                        id="inspection_year"
-                        aria-label="inspection_year"
-                        onChange={(e) => setInspectionYear(e.target.value)}
-                        value={inspectionYear}
-                      >
-                        <option value="curr_year">Current Year</option>
-                        {[...Array(3)].map((_, i) => {
-                          const year = new Date().getFullYear() + 1 + i;
-                          return (
-                            <option key={year} value={year}>
-                              {year}
-                            </option>
-                          );
-                        })}
-                      </select>
-
-                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                        <RiArrowDownSFill className="flex w-4 h-4 object-contain cursor-pointer" />
-                      </div>
-                    </div>
-                  </div>
-                  <div className="w-full lg:w-1/2 flex gap-2 items-center">
-                    <h6 className="w-1/2 font-monts font-bold text-sm text-darkerGray">
-                      Date/s of Inspection:
+                      Inspection Date:
                     </h6>
                     <input
                       aria-label="date"
@@ -221,8 +196,6 @@ export default function AddNewInspection({
                       value={date}
                     />
                   </div>
-                </div>
-                <div className="flex flex-col lg:flex-row gap-6">
                   <div className="w-full lg:w-1/2 flex gap-2 items-center">
                     <h6 className="w-1/2 font-monts font-bold text-sm text-darkerGray">
                       Inspection Mode
@@ -245,8 +218,10 @@ export default function AddNewInspection({
                       </div>
                     </div>
                   </div>
-                  <div className="w-full lg:w-1/2 flex gap-2 items-center">
-                    <h6 className="w-1/2 font-monts font-bold text-sm text-darkerGray">
+                </div>
+                <div className="flex flex-col lg:flex-row gap-6">
+                  <div className="w-full lg:w-full flex gap-2 items-center">
+                    <h6 className="w-1/2 lg:w-[19%] font-monts font-bold text-sm text-darkerGray">
                       Regional Office:
                     </h6>
                     <div className="w-full relative">

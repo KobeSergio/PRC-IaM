@@ -2,48 +2,68 @@
 
 import Breadcrumbs from "@/components/Breadcrumbs";
 import CancellationRequest from "@/components/Modals/CancellationRequest";
-import EditInspection from "@/components/Modals/Dashboard/EditInspection";
+import EditClient from "@/components/Modals/Dashboard/EditClient";
 import ReschedulingRequest from "@/components/ReschedulingRequest";
 import IMWPR from "@/components/Tasks/IMWPR";
 import NIM from "@/components/Tasks/NIM";
 import PendingWaiting from "@/components/Tasks/PendingWaiting";
 import ScheduleApproval from "@/components/Tasks/ScheduleApproval";
+import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import { BsPencil, BsX } from "react-icons/bs";
 import { RiArrowDownSFill, RiSearchLine } from "react-icons/ri";
+import Firebase from "@/lib/firebase";
+import { Inspection } from "@/types/Inspection";
+import { Client } from "@/types/Client";
+const firebase = new Firebase();
 
-export default function Inspection() {
+export default function Page({ params }: { params: { id: string } }) {
   const [showEditInspectionModal, setShowEditInspectionModal] = useState(false);
   const [showCancellationModal, setShowCancellationModal] = useState(false);
   const [showRescheduleModal, setShowRescheduleModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const breadcrumbItems = [
-    {
-      name: "Dashboard",
-      route: "/dashboard",
-    },
-    {
-      name: "Name",
-    },
-  ];
+  const [inspectionData, setInspectionData] = useState<Inspection>(
+    {} as Inspection
+  );
+
+  useEffect(() => {
+    if (params.id) {
+      firebase
+        .getInspection(params.id as string)
+        .then((data) => {
+          if (data == null) return;
+          setInspectionData(data);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
+  }, [params.id]);
 
   const handleCloseEditInspection = () => {
     setShowEditInspectionModal(false);
   };
-  const handleSubmitEditInspection = () => {
+
+  const handleSubmitEditClient = async (new_client_details: Client) => {
     //insert logic here
     setIsLoading(true);
 
-    setTimeout(() => {
-      setShowEditInspectionModal(false);
-      setIsLoading(false);
-    }, 2000);
+    await firebase.updateClient(new_client_details).then(() => {
+      setInspectionData({
+        ...inspectionData,
+        client_details: new_client_details,
+      });
+    });
+
+    setShowEditInspectionModal(false);
+    setIsLoading(false);
   };
 
   const handleCloseCancellationRequest = () => {
     setShowCancellationModal(false);
   };
+
   const handleSubmitCancellationRequest = () => {
     //insert logic here
     setIsLoading(true);
@@ -57,6 +77,7 @@ export default function Inspection() {
   const handleCloseReschedulingRequest = () => {
     setShowRescheduleModal(false);
   };
+
   const handleSubmitReschedulingRequest = () => {
     //insert logic here
     setIsLoading(true);
@@ -79,13 +100,28 @@ export default function Inspection() {
     }
   }, [showEditInspectionModal]);
 
+  if (Object.keys(inspectionData).length == 0) return <></>;
+
+  const breadcrumbItems = [
+    {
+      name: "Home",
+      route: "/dashboard",
+    },
+    {
+      name: inspectionData.client_details.name,
+    },
+  ];
+
+  const task = inspectionData.inspection_task.toLowerCase();
+
   return (
     <>
-      <EditInspection
+      <EditClient
         isOpen={showEditInspectionModal}
         setter={handleCloseEditInspection}
         isLoading={isLoading}
-        onSubmit={handleSubmitEditInspection}
+        onSubmit={handleSubmitEditClient}
+        client_details={inspectionData.client_details}
       />
       <CancellationRequest
         isOpen={showCancellationModal}
@@ -122,7 +158,7 @@ export default function Inspection() {
                 Name
               </h6>
               <p className="font-monts text-sm font-semibold text-darkerGray">
-                Mapua University - Makati
+                {inspectionData.client_details.name}
               </p>
             </div>
             <div className="flex flex-col gap-1">
@@ -130,7 +166,7 @@ export default function Inspection() {
                 Type
               </h6>
               <p className="font-monts text-sm font-semibold text-darkerGray">
-                Higher Education
+                {inspectionData.client_details.type}
               </p>
             </div>
             <div className="flex flex-col gap-1">
@@ -138,7 +174,7 @@ export default function Inspection() {
                 Location
               </h6>
               <p className="font-monts text-sm font-semibold text-darkerGray">
-                1191 Pablo Ocampo Sr. Ext, Makati, Metro Manila
+                {inspectionData.client_details.address}
               </p>
             </div>
             <div className="flex flex-col gap-1">
@@ -146,7 +182,7 @@ export default function Inspection() {
                 Email
               </h6>
               <p className="font-monts text-sm font-semibold text-primaryBlue hover:underline">
-                registrar@mapua.edu.ph
+                {inspectionData.client_details.email}
               </p>
             </div>
             <div className="flex flex-col gap-1">
@@ -154,7 +190,7 @@ export default function Inspection() {
                 Mode
               </h6>
               <p className="font-monts text-sm font-semibold text-darkerGray">
-                Physical
+                {inspectionData.inspection_mode}
               </p>
             </div>
             <div className="flex flex-col gap-1">
@@ -162,7 +198,7 @@ export default function Inspection() {
                 Date Issued
               </h6>
               <p className="font-monts text-sm font-semibold text-darkerGray">
-                5/20/2023
+                {inspectionData.createdAt}
               </p>
             </div>
             <div className="flex flex-col gap-1">
@@ -170,34 +206,59 @@ export default function Inspection() {
                 Inspection Date
               </h6>
               <p className="font-monts text-sm font-semibold text-darkerGray">
-                TBD
+                {inspectionData.inspection_task == "Scheduling"
+                  ? "TBD"
+                  : inspectionData.inspection_date}
               </p>
             </div>
           </div>
-          <div className="flex w-full justify-end">
-            <h6 className="font-monts text-sm font-semibold text-darkerGray">
-              Travel/Office Order No.:{" "}
-              <span className="text-primaryBlue">#92152613734734</span>
-            </h6>
-          </div>
+          {inspectionData.inspection_TO !== "" && (
+            <div className="flex w-full justify-end">
+              <h6 className="font-monts text-sm font-semibold text-darkerGray">
+                Travel/Office Order No.:{" "}
+                <span className="text-primaryBlue">#92152613734734</span>
+              </h6>
+            </div>
+          )}
         </div>
-        {/* <div className="flex flex-row flex-wrap justify-end gap-2">
-        <button
-          type="button"
-          onClick={() => setShowRescheduleModal(true)}
-          className="w-full md:w-fit flex items-center justify-center gap-2 cursor-pointer text-gray border bg-primaryBlue border-primaryBlue rounded-lg font-monts font-semibold text-sm text-white h-fit p-2.5"
-        >
-          Request for rescheduling
-        </button>
-        <button
-          type="button"
-          onClick={() => setShowCancellationModal(true)}
-          className="w-full md:w-fit flex items-center justify-center gap-2 cursor-pointer text-gray border bg-[#973C3C] border-[#973C3C] rounded-lg font-monts font-semibold text-sm text-white h-fit p-2.5"
-        >
-          Request for cancellation
-        </button>
-      </div> */}
-        <IMWPR />
+
+        {/* If inspection data is scheduling and if a cancellation/rescheduling request is already ongoing, dont show the btns */}
+        {task != "scheduling" &&
+          task.includes("for") &&
+          (task.includes("approval") ||
+            inspectionData.inspection_task
+              .toLowerCase()
+              .includes("recommendation")) && (
+            <div className="flex flex-row flex-wrap justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setShowRescheduleModal(true)}
+                className="w-full md:w-fit flex items-center justify-center gap-2 cursor-pointer text-gray border bg-primaryBlue border-primaryBlue rounded-lg font-monts font-semibold text-sm text-white h-fit p-2.5"
+              >
+                Request for rescheduling
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowCancellationModal(true)}
+                className="w-full md:w-fit flex items-center justify-center gap-2 cursor-pointer text-gray border bg-[#973C3C] border-[#973C3C] rounded-lg font-monts font-semibold text-sm text-white h-fit p-2.5"
+              >
+                Request for cancellation
+              </button>
+            </div>
+          )}
+
+        {task == "scheduling - PRB" ? (
+          <ScheduleApproval />
+        ) : task == "imwpr" ? (
+          <IMWPR />
+        ) : task == "send nim" ? (
+          <NIM />
+        ) : task == "review inspection requirements" ? (
+          //To follow interface where the client can upload the requirements
+          <></>
+        ) : (
+          <PendingWaiting />
+        )}
       </div>
     </>
   );

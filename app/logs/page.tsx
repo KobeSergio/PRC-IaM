@@ -1,8 +1,6 @@
 "use client";
 
 import Sidebar from "@/components/Sidebar";
-import Image from "next/image";
-import Link from "next/link";
 import { useState, useEffect } from "react";
 import { Chart as ChartJS, ArcElement } from "chart.js";
 import { Pie } from "react-chartjs-2";
@@ -11,25 +9,12 @@ import { BsFunnel, BsX } from "react-icons/bs";
 ChartJS.register(ArcElement);
 import Firebase from "@/lib/firebase";
 import { FilterModal } from "@/components/Modals/Logs/FilterModal";
-import { Log } from "@/types/Log";
-const firebase = new Firebase();
+import { useLogs } from "@/contexts/LogContext";
 
 export default function Logs() {
   const [showModal, setShowModal] = useState(false);
-  const [logs, setLogs] = useState<Log[]>([]);
 
-  useEffect(() => {
-    if (logs.length == 0) {
-      firebase
-        .getAllLogs()
-        .then((data) => {
-          setLogs(data);
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    }
-  }, []);
+  const { logs } = useLogs();
 
   const handleButtonClick = () => {
     setShowModal(true);
@@ -146,7 +131,7 @@ export default function Logs() {
               {logs.length == 0 ? (
                 <div>
                   <h3 className="font-monts font-medium text-base text-center text-darkerGray">
-                    There are no items to display. 
+                    There are no items to display.
                   </h3>
                 </div>
               ) : (

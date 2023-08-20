@@ -7,11 +7,17 @@ export default function PendingWaiting() {
         Inspection Task
       </h1>
       <div className="flex flex-col gap-5 justify-center items-center">
-        <h6 className="font-monts font-semibold text-sm text-darkerGray">Fulfill your IWMPR and NIM on the given inspection date.</h6>
+        <h6 className="font-monts font-semibold text-sm text-darkerGray">
+          Fulfill your IWMPR and NIM on the given inspection date.
+        </h6>
         <h6 className="font-monts font-semibold text-sm text-darkerGray">Or</h6>
-        <h6 className="font-monts font-semibold text-sm text-darkerGray">Nothing to do here now, the inspection request is still pending.</h6>
+        <h6 className="font-monts font-semibold text-sm text-darkerGray">
+          Nothing to do here now, the inspection request is still pending.
+        </h6>
         <h6 className="font-monts font-semibold text-sm text-darkerGray">Or</h6>
-        <h6 className="font-monts font-semibold text-sm text-darkerGray">Waiting approval from the client.</h6>
+        <h6 className="font-monts font-semibold text-sm text-darkerGray">
+          Waiting approval from the client.
+        </h6>
       </div>
     </div>
   );

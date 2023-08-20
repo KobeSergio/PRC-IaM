@@ -1,13 +1,67 @@
 import Spinner from "@/components/Spinner";
+import { Inspection } from "@/types/Inspection";
 import React, { useState } from "react";
 
 import { BsX } from "react-icons/bs";
 
-export default function FilterModal({ isOpen, setter, isLoading, onSubmit }: any) {
+export default function FilterModal({
+  isOpen,
+  setter,
+  isLoading,
+  inspections,
+  setFilteredInspections,
+}: any) {
+  const [checkboxState, setCheckboxState] = useState({
+    establishment: false,
+    HEI: false,
+    physical: false,
+    blended: false,
+    virtual: false,
+    scheduling: false,
+    NIM: false,
+    VS: false,
+    IMWPR: false,
+  });
+
+  const handleCheckboxChange = (event: any) => {
+    const { id, checked } = event.target;
+    setCheckboxState((prevState) => ({
+      ...prevState,
+      [id]: checked,
+    }));
+  };
+
+  const onSubmit = () => {
+    const filteredInspections = inspections.filter((inspection: Inspection) => {
+      if (
+        (checkboxState.establishment &&
+          inspection.client_details.type === "Establishment") ||
+        (checkboxState.HEI && inspection.client_details.type === "HEI") ||
+        (checkboxState.physical && inspection.inspection_mode === "Physical") ||
+        (checkboxState.blended && inspection.inspection_mode === "Blended") ||
+        (checkboxState.virtual && inspection.inspection_mode === "Virtual") ||
+        (checkboxState.scheduling &&
+          inspection.inspection_task === "Scheduling - PRB") ||
+        (checkboxState.NIM && inspection.inspection_task === "NIM") ||
+        // This seems to be a duplicate condition for NIM. I'm not sure if "VS" was intended to be another checkbox or not.
+        // I'm keeping it here for now. If "VS" is not a valid condition, you can remove this line.
+        (checkboxState.VS && inspection.inspection_task === "VS") ||
+        (checkboxState.IMWPR && inspection.inspection_task === "IMWPR")
+      ) {
+        return true;
+      }
+
+      return false;
+    });
+
+    setFilteredInspections(filteredInspections);
+    setter();
+  };
 
   if (isOpen === false) {
     return <></>;
   }
+
   return (
     <div className="fixed z-40 top-0 left-0 right-0 bottom-0 bg-black bg-opacity-50 flex justify-center items-center">
       <div className=" overflow-x-hidden overflow-y-auto fixed w-full h-full inset-0 z-50 outline-none focus:outline-none">
@@ -33,7 +87,8 @@ export default function FilterModal({ isOpen, setter, isLoading, onSubmit }: any
                     <input
                       id="establishment"
                       type="checkbox"
-                      value=""
+                      checked={checkboxState.establishment}
+                      onChange={handleCheckboxChange}
                       className="w-[14px] h-[14px] bg-white border-[#E2E3E4] rounded-sm accent-[#3C6497]"
                     />
                     <label
@@ -47,7 +102,8 @@ export default function FilterModal({ isOpen, setter, isLoading, onSubmit }: any
                     <input
                       id="HEI"
                       type="checkbox"
-                      value=""
+                      checked={checkboxState.HEI}
+                      onChange={handleCheckboxChange}
                       className="w-[14px] h-[14px] bg-white border-[#E2E3E4] rounded-sm accent-[#3C6497]"
                     />
                     <label
@@ -66,7 +122,8 @@ export default function FilterModal({ isOpen, setter, isLoading, onSubmit }: any
                     <input
                       id="physical"
                       type="checkbox"
-                      value=""
+                      checked={checkboxState.physical}
+                      onChange={handleCheckboxChange}
                       className="w-[14px] h-[14px] bg-white border-[#E2E3E4] rounded-sm accent-[#3C6497]"
                     />
                     <label
@@ -80,7 +137,8 @@ export default function FilterModal({ isOpen, setter, isLoading, onSubmit }: any
                     <input
                       id="blended"
                       type="checkbox"
-                      value=""
+                      checked={checkboxState.blended}
+                      onChange={handleCheckboxChange}
                       className="w-[14px] h-[14px] bg-white border-[#E2E3E4] rounded-sm accent-[#3C6497]"
                     />
                     <label
@@ -94,7 +152,8 @@ export default function FilterModal({ isOpen, setter, isLoading, onSubmit }: any
                     <input
                       id="virtual"
                       type="checkbox"
-                      value=""
+                      checked={checkboxState.virtual}
+                      onChange={handleCheckboxChange}
                       className="w-[14px] h-[14px] bg-white border-[#E2E3E4] rounded-sm accent-[#3C6497]"
                     />
                     <label
@@ -117,7 +176,8 @@ export default function FilterModal({ isOpen, setter, isLoading, onSubmit }: any
                       <input
                         id="scheduling"
                         type="checkbox"
-                        value=""
+                        checked={checkboxState.scheduling}
+                        onChange={handleCheckboxChange}
                         className="w-[14px] h-[14px] bg-white border-[#E2E3E4] rounded-sm accent-[#3C6497]"
                       />
                       <label
@@ -129,9 +189,25 @@ export default function FilterModal({ isOpen, setter, isLoading, onSubmit }: any
                     </div>
                     <div className="w-full flex items-center">
                       <input
+                        id="VS"
+                        type="checkbox"
+                        checked={checkboxState.VS}
+                        onChange={handleCheckboxChange}
+                        className="w-[14px] h-[14px] bg-white border-[#E2E3E4] rounded-sm accent-[#3C6497]"
+                      />
+                      <label
+                        htmlFor="VS"
+                        className="ml-2 font-monts text-sm font-medium text-darkerGray"
+                      >
+                        VS
+                      </label>
+                    </div>
+                    <div className="w-full flex items-center">
+                      <input
                         id="NIM"
                         type="checkbox"
-                        value=""
+                        checked={checkboxState.NIM}
+                        onChange={handleCheckboxChange}
                         className="w-[14px] h-[14px] bg-white border-[#E2E3E4] rounded-sm accent-[#3C6497]"
                       />
                       <label
@@ -150,7 +226,8 @@ export default function FilterModal({ isOpen, setter, isLoading, onSubmit }: any
                       <input
                         id="IMWPR"
                         type="checkbox"
-                        value=""
+                        checked={checkboxState.IMWPR}
+                        onChange={handleCheckboxChange}
                         className="w-[14px] h-[14px] bg-white border-[#E2E3E4] rounded-sm accent-[#3C6497]"
                       />
                       <label
@@ -169,16 +246,19 @@ export default function FilterModal({ isOpen, setter, isLoading, onSubmit }: any
               <button
                 className="background-transparent outline-none focus:outline-none py-2 px-4 font-monts font-semibold text-sm text-[#C4C5C5]"
                 type="button"
-                onClick={setter}
+                onClick={() => {
+                  setFilteredInspections(inspections);
+                  setter();
+                }}
               >
-                Cancel
+                Clear filters
               </button>
               <button
                 className={`${
                   isLoading ? "flex items-center gap-0.5" : ""
                 } py-2 px-4 font-monts font-semibold text-sm text-white bg-[#3C6497] rounded-lg outline-none`}
                 type="button"
-                onClick={onSubmit}
+                onClick={() => onSubmit()}
               >
                 {isLoading ? (
                   <>
