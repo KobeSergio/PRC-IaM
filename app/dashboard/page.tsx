@@ -14,6 +14,7 @@ import { useLogs } from "@/contexts/LogContext";
 import { PRB } from "@/types/PRB";
 import { Log } from "@/types/Log";
 import { Inspection } from "@/types/Inspection";
+import { useSession } from "next-auth/react";
 ChartJS.register(ArcElement);
 
 export default function Dashboard() {
@@ -22,6 +23,7 @@ export default function Dashboard() {
 
   const { inspections } = useInspections();
   const { logs } = useLogs();
+  const { data } = useSession();
 
   //This is the list of inspections that will be displayed
   const [filteredInspections, setFilteredInspections] =
@@ -103,8 +105,8 @@ export default function Dashboard() {
   } as any);
 
   useEffect(() => {
-    if (logs.length != 0) {
-      const user = JSON.parse(localStorage.getItem("prb") as string) as PRB;
+    if (logs.length != 0 && data != null) {
+      const user = data.user as any;
       const _logs = logs.filter((log) => log.author_id == user.prb_id);
 
       const accomplished = _logs.filter((log) =>
@@ -149,7 +151,9 @@ export default function Dashboard() {
       } else {
         const searchFilteredInspections = filteredInspections.filter(
           (inspection) =>
-            inspection.client_details.name.toLowerCase().includes(search.toLowerCase())
+            inspection.client_details.name
+              .toLowerCase()
+              .includes(search.toLowerCase())
         );
         setFilteredInspections(searchFilteredInspections);
       }

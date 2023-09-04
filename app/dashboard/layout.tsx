@@ -6,6 +6,9 @@ import { getServerSession } from "next-auth/next";
 export const metadata = {
   title: "PRC Application Management System",
   description: "",
+  icons: {
+    icon: "/assets/icons/favicon.svg",
+  },
 };
 
 export default async function DashboardLayout({
