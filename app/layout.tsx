@@ -10,6 +10,12 @@ import { useEffect, useState } from "react";
 import Firebase from "@/lib/firebase";
 import { LogContext } from "@/contexts/LogContext";
 import { Log } from "@/types/Log";
+
+export const metadata = {
+  title: "PRC Inspection and Monitoring System",
+  description: "",
+};
+
 const firebase = new Firebase();
 
 type InspectionProviderProps = {

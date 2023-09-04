@@ -267,6 +267,7 @@ export default function FilterModal({
                       id="rescheduled"
                       type="checkbox"
                       checked={checkboxState.rescheduled}
+                      onChange={handleCheckboxChange}
                       className="w-[14px] h-[14px] bg-white border-[#E2E3E4] rounded-sm accent-[#3C6497]"
                     />
                     <label
@@ -281,6 +282,7 @@ export default function FilterModal({
                       id="cancelled"
                       type="checkbox"
                       checked={checkboxState.cancelled}
+                      onChange={handleCheckboxChange}
                       className="w-[14px] h-[14px] bg-white border-[#E2E3E4] rounded-sm accent-[#3C6497]"
                     />
                     <label
@@ -295,6 +297,7 @@ export default function FilterModal({
                       id="random"
                       type="checkbox"
                       checked={checkboxState.random}
+                      onChange={handleCheckboxChange}
                       className="w-[14px] h-[14px] bg-white border-[#E2E3E4] rounded-sm accent-[#3C6497]"
                     />
                     <label
@@ -309,6 +312,7 @@ export default function FilterModal({
                       id="approved"
                       type="checkbox"
                       checked={checkboxState.approved}
+                      onChange={handleCheckboxChange}
                       className="w-[14px] h-[14px] bg-white border-[#E2E3E4] rounded-sm accent-[#3C6497]"
                     />
                     <label
@@ -323,6 +327,7 @@ export default function FilterModal({
                       id="additional"
                       type="checkbox"
                       checked={checkboxState.additional}
+                      onChange={handleCheckboxChange}
                       className="w-[14px] h-[14px] bg-white border-[#E2E3E4] rounded-sm accent-[#3C6497]"
                     />
                     <label
@@ -342,6 +347,7 @@ export default function FilterModal({
                       id="under_review"
                       type="checkbox"
                       checked={checkboxState.under_review}
+                      onChange={handleCheckboxChange}
                       className="w-[14px] h-[14px] bg-white border-[#E2E3E4] rounded-sm accent-[#3C6497]"
                     />
                     <label
@@ -356,6 +362,7 @@ export default function FilterModal({
                       id="non_compliant"
                       type="checkbox"
                       checked={checkboxState.non_compliant}
+                      onChange={handleCheckboxChange}
                       className="w-[14px] h-[14px] bg-white border-[#E2E3E4] rounded-sm accent-[#3C6497]"
                     />
                     <label
@@ -370,6 +377,7 @@ export default function FilterModal({
                       id="for_compliance"
                       type="checkbox"
                       checked={checkboxState.for_compliance}
+                      onChange={handleCheckboxChange}
                       className="w-[14px] h-[14px] bg-white border-[#E2E3E4] rounded-sm accent-[#3C6497]"
                     />
                     <label
@@ -384,6 +392,7 @@ export default function FilterModal({
                       id="compliant"
                       type="checkbox"
                       checked={checkboxState.compliant}
+                      onChange={handleCheckboxChange}
                       className="w-[14px] h-[14px] bg-white border-[#E2E3E4] rounded-sm accent-[#3C6497]"
                     />
                     <label
