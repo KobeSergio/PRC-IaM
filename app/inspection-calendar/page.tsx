@@ -69,7 +69,7 @@ export default function InspectionCalendar() {
       } else {
         const searchFilteredInspections = filteredInspections.filter(
           (inspection) =>
-            inspection.client_details.name.toLowerCase().includes(search)
+            inspection.client_details.name.toLowerCase().includes(search.toLowerCase())
         );
         setFilteredInspections(searchFilteredInspections);
       }
@@ -406,7 +406,7 @@ export default function InspectionCalendar() {
                 </h3>
               </div>
 
-              <div className="lg:overflow-y-auto w-full max-h-[25rem] justify-center items-center flex">
+              <div className="lg:overflow-y-auto w-full max-h-[25rem] justify-center items-center flex flex-col">
                 {filteredInspections.length == 0 ? (
                   <h3 className="font-monts font-medium text-base text-center text-darkerGray">
                     There are no items to display.

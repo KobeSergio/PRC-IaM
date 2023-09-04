@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 import Firebase from "@/lib/firebase";
 import { LogContext } from "@/contexts/LogContext";
 import { Log } from "@/types/Log";
+import { SessionProvider } from "next-auth/react";
 const firebase = new Firebase();
 
 type InspectionProviderProps = {
@@ -28,9 +29,6 @@ export const InspectionProvider: React.FC<InspectionProviderProps> = ({
     if (prb) {
       setPrb(JSON.parse(prb));
     }
-  }, []);
-
-  useEffect(() => {
     if (inspections.length == 0) {
       firebase
         .getAllInspections()
@@ -88,13 +86,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <InspectionProvider>
-          <LogProvider>
-            {pathname !== "/" && <Nav />}
-            <main className="">{children}</main>
-            {pathname !== "/" && <Footer />}
-          </LogProvider>
-        </InspectionProvider>
+        <SessionProvider>
+          <InspectionProvider>
+            <LogProvider>
+              {pathname !== "/" && <Nav />}
+              <main className="">{children}</main>
+              {pathname !== "/" && <Footer />}
+            </LogProvider>
+          </InspectionProvider>
+        </SessionProvider>
       </body>
     </html>
   );

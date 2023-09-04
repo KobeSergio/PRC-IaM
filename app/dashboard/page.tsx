@@ -149,7 +149,7 @@ export default function Dashboard() {
       } else {
         const searchFilteredInspections = filteredInspections.filter(
           (inspection) =>
-            inspection.client_details.name.toLowerCase().includes(search)
+            inspection.client_details.name.toLowerCase().includes(search.toLowerCase())
         );
         setFilteredInspections(searchFilteredInspections);
       }
