@@ -1,7 +1,7 @@
 import "../../styles/globals.css";
 
 export const metadata = {
-  title: "PRC Application Management System",
+  title: "PRC Inspection and Monitoring System",
   description: "",
 };
 
