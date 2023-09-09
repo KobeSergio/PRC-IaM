@@ -21,14 +21,9 @@ export const InspectionProvider: React.FC<InspectionProviderProps> = ({
   children,
 }) => {
   //Declare contexts here (Inspections and prb from local storage)
-  const [prb, setPrb] = useState("");
   const [inspections, setInspections] = useState<Inspection[]>([]);
 
   useEffect(() => {
-    const prb = localStorage.getItem("prb");
-    if (prb) {
-      setPrb(JSON.parse(prb));
-    }
     if (inspections.length == 0) {
       firebase
         .getAllInspections()
@@ -42,7 +37,7 @@ export const InspectionProvider: React.FC<InspectionProviderProps> = ({
   }, []);
 
   return (
-    <InspectionContext.Provider value={{ prb, inspections, setInspections }}>
+    <InspectionContext.Provider value={{ inspections, setInspections }}>
       {children}
     </InspectionContext.Provider>
   );

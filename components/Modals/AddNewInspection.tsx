@@ -11,6 +11,7 @@ import { ACD } from "@/types/ACD";
 import { OC } from "@/types/OC";
 import { PRB } from "@/types/PRB";
 import { Log } from "@/types/Log";
+import { useSession } from "next-auth/react";
 
 export default function AddNewInspection({
   isOpen,
@@ -18,6 +19,7 @@ export default function AddNewInspection({
   updateInspections,
 }: any) {
   const firebase = new Firebase();
+  const { data } = useSession();
 
   //Loaders
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -66,8 +68,10 @@ export default function AddNewInspection({
 
   //Handle form submission
   const handleSubmit = async () => {
-    //Get prb details from local_storage
-    const prb = JSON.parse(localStorage.getItem("prb") as string) as PRB;
+    if (!data) return;
+
+    const user = data.user as any;
+    const prb = (await firebase.getPRBDetails(user.prb_id)) as PRB;
     if (prb === null || prb === undefined) {
       alert("Something went wrong, please re-login and try again");
       return;
