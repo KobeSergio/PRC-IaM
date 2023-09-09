@@ -8,6 +8,9 @@ import { Pie } from "react-chartjs-2";
 import { RiArrowDownSFill, RiSearchLine } from "react-icons/ri";
 import { BsFunnel, BsCalendar3, BsPlusLg, BsList } from "react-icons/bs";
 import FilterModal from "@/components/Modals/InspectionCalendar/FilterModal";
+import FullCalendar from "@fullcalendar/react";
+import dayGridPlugin from "@fullcalendar/daygrid"; // a plugin!
+import interactionPlugin from "@fullcalendar/interaction"; // needed for dayClick
 ChartJS.register(ArcElement);
 
 import { useInspections } from "@/contexts/InspectionContext";
@@ -191,6 +194,12 @@ export default function InspectionCalendar() {
     }
   }, [showFilterModal]);
 
+  //Calendar handler
+  const handleEventClick = (arg: any) => {
+    // bind with an arrow function
+    alert(arg.dateStr);
+  };
+
   return (
     <>
       <FilterModal
@@ -262,7 +271,15 @@ export default function InspectionCalendar() {
                 </button>
               </div>
             </div>
-            <div>insert calendar here</div>
+            <div className="bg-white p-4 rounded-lg">
+              <FullCalendar
+                plugins={[dayGridPlugin, interactionPlugin]}
+                initialView="dayGridMonth"
+                eventClick={handleEventClick}
+                selectable={true}
+                events={[{ title: "event 1", date: "2023-09-01" }]}
+              />
+            </div>
           </div>
         ) : (
           // List Section
@@ -427,9 +444,11 @@ export default function InspectionCalendar() {
 
               <div className="lg:overflow-y-auto w-full max-h-[25rem] justify-center items-center flex flex-col">
                 {filteredInspections.length == 0 ? (
-                  <h3 className="font-monts font-medium text-base text-center text-darkerGray">
-                    There are no items to display.
-                  </h3>
+                  <div className="flex justify-center items-center p-6">
+                    <h3 className="font-monts font-medium text-base text-center text-darkerGray">
+                      There are no items to display.
+                    </h3>
+                  </div>
                 ) : (
                   <>
                     {filteredInspections.map((row, index) => (

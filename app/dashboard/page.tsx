@@ -23,38 +23,64 @@ export default function Dashboard() {
 
   const { inspections } = useInspections();
   const { logs } = useLogs();
-  const { data } = useSession();
 
-  //This is the list of inspections that will be displayed
-  const [filteredInspections, setFilteredInspections] =
-    useState<Inspection[]>(inspections);
+  const { data } : any = useSession();
+
   const [filteredLogs, setFilteredLogs] = useState<Log[]>(logs);
-
   //Year sorter
   const currentYear = new Date().getFullYear();
   const [selectedYear, setSelectedYear] = useState("All" as any); // Default to current year
   const [years, setYears] = useState([currentYear]);
+  const defaultInspections = inspections.filter(
+    (inspection) =>
+      inspection.inspection_task.includes("Scheduling - PRB") ||
+      inspection.inspection_task.includes("IMAT") ||
+      inspection.inspection_task.includes("NIM") ||
+      inspection.inspection_task.includes("VS") ||
+      inspection.inspection_task.includes("IMWPR")
+  );
+
+  //This is the list of inspections that will be displayed
+  const [filteredInspections, setFilteredInspections] =
+    useState<Inspection[]>(defaultInspections);
+
+  //Default filter
+  useEffect(() => {
+    if (defaultInspections.length > 0 && filteredInspections.length == 0)
+      setFilteredInspections(defaultInspections);
+  }, [defaultInspections]);
 
   //Handler for year filter
   useEffect(() => {
     if (selectedYear == "All") {
-      setFilteredInspections(inspections);
+      setFilteredInspections(
+        inspections.filter(
+          (inspection) =>
+            inspection.inspection_task.includes("Scheduling - PRB") ||
+            inspection.inspection_task.includes("IMAT") ||
+            inspection.inspection_task.includes("NIM") ||
+            inspection.inspection_task.includes("VS") ||
+            inspection.inspection_task.includes("IMWPR")
+        )
+      );
       setFilteredLogs(logs);
     } else {
-      const filteredInspections = inspections.filter(
+      const filteredInspections = defaultInspections.filter(
         (inspection) =>
           new Date(inspection.inspection_date).getFullYear() ==
-          parseInt(selectedYear)
+          (selectedYear == "All" ? true : parseInt(selectedYear))
       );
       setFilteredInspections(filteredInspections);
 
       //Filtered logs also
       const filteredLogs = logs.filter(
-        (log) => new Date(log.timestamp).getFullYear() == parseInt(selectedYear)
+        (log) =>
+          new Date(log.timestamp).getFullYear() ==
+          (selectedYear == "All" ? true : parseInt(selectedYear))
       );
       setFilteredLogs(filteredLogs);
     }
-  }, [selectedYear]);
+  }, [selectedYear, inspections]);
 
   //Get number of inspections where inspection_task is Scheduling, NIM, VS, and IMWPR
   const [scheduling, setScheduling] = useState(0);
@@ -64,17 +90,18 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (filteredInspections.length > 0) {
-      const _scheduling = filteredInspections.filter(
-        (inspection) => inspection.inspection_task == "Scheduling"
+      console.log(filteredInspections);
+      const _scheduling = filteredInspections.filter((inspection) =>
+        inspection.inspection_task.includes("Scheduling")
       ).length;
-      const _nim = filteredInspections.filter(
-        (inspection) => inspection.inspection_task == "NIM"
+      const _nim = filteredInspections.filter((inspection) =>
+        inspection.inspection_task.includes("NIM")
       ).length;
-      const _vs = filteredInspections.filter(
-        (inspection) => inspection.inspection_task == "VS"
+      const _vs = filteredInspections.filter((inspection) =>
+        inspection.inspection_task.includes("VS")
       ).length;
-      const _imwpr = filteredInspections.filter(
-        (inspection) => inspection.inspection_task == "IMWPR"
+      const _imwpr = filteredInspections.filter((inspection) =>
+        inspection.inspection_task.includes("IMWPR")
       ).length;
 
       setScheduling(_scheduling);
@@ -83,7 +110,7 @@ export default function Dashboard() {
       setImwpr(_imwpr);
 
       const uniqueYears = new Set(
-        inspections.map((inspection) =>
+        defaultInspections.map((inspection) =>
           new Date(inspection.inspection_date).getFullYear()
         )
       );
@@ -106,8 +133,8 @@ export default function Dashboard() {
 
   useEffect(() => {
     if (logs.length != 0 && data != null) {
-      const user = data.user as any;
-      const _logs = logs.filter((log) => log.author_id == user.prb_id);
+      const user = data as any;
+      const _logs = logs.filter((log) => log.author_id == data.prb_id);
 
       const accomplished = _logs.filter((log) =>
         log.action.includes("Accomplished")
@@ -132,19 +159,23 @@ export default function Dashboard() {
 
   //Search filter
   const [search, setSearch] = useState("");
-
   //Handler for search filter
   useEffect(() => {
-    if (inspections.length > 0) {
+    if (defaultInspections.length > 0) {
       if (search == "") {
         if (selectedYear == "All") {
-          setFilteredInspections(inspections);
+          setFilteredInspections(defaultInspections);
         } else {
           setFilteredInspections(
             inspections.filter(
               (inspection) =>
                 new Date(inspection.inspection_date).getFullYear() ==
-                parseInt(selectedYear)
+                  (selectedYear == "All" ? true : parseInt(selectedYear)) &&
+                (inspection.inspection_task.includes("Scheduling - PRB") ||
+                  inspection.inspection_task.includes("IMAT") ||
+                  inspection.inspection_task.includes("NIM") ||
+                  inspection.inspection_task.includes("VS") ||
+                  inspection.inspection_task.includes("IMWPR"))
             )
           );
         }
@@ -175,7 +206,7 @@ export default function Dashboard() {
         isOpen={showFilterModal}
         setter={() => setShowFilterModal(false)}
         isLoading={isLoading}
-        inspections={inspections}
+        inspections={filteredInspections}
         setFilteredInspections={setFilteredInspections}
       />
       <div className="min-h-[75vh] flex flex-col lg:flex-row gap-5">
@@ -215,10 +246,13 @@ export default function Dashboard() {
                   </div>
                   <div className="w-1/2 flex flex-col gap-3">
                     <h6 className="font-monts text-sm font-semibold">
-                      Pre-inspection tasks:
+                      Post-inspection tasks:
                     </h6>
                     <div className="flex flex-row justify-between font-monts text-sm">
-                      <p className="font-medium">IMWPR</p>
+                      <p className="font-medium">
+                        Inspection and Monitoring Work Program and Report
+                        (IMWPR)
+                      </p>
                       <p className="font-semibold">{imwpr}</p>
                     </div>
                   </div>
@@ -340,10 +374,9 @@ export default function Dashboard() {
               </h3>
               <h3 className="col-span-1 font-monts font-semibold text-sm text-center text-[#5C5C5C] px-4 pr-0"></h3>
             </div>
-
-            <div className="lg:overflow-y-auto w-full max-h-[25rem]">
+            <div className="lg:overflow-y-auto w-full h-[55%]">
               {filteredInspections.length == 0 ? (
-                <div className="flex justify-center items-center p-6">
+                <div className="flex justify-center items-center h-full">
                   <h3 className="font-monts font-medium text-base text-center text-darkerGray">
                     There are no items to display.
                   </h3>
@@ -372,7 +405,9 @@ export default function Dashboard() {
                         {row.inspection_mode}
                       </h3>
                       <h3 className=" col-span-2 font-monts font-semibold text-sm text-center text-darkerGray px-4">
-                        {row.inspection_task}
+                        {
+                          row.inspection_task.replace(/<[^>]+>/g, "").trim() //Removes <>
+                        }
                       </h3>
                       <h3 className=" col-span-1 font-monts font-semibold text-sm text-center text-darkerGray px-4">
                         {row.inspection_date}

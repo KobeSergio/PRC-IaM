@@ -536,6 +536,19 @@ export default class Firebase {
     }
   }
 
+  //PUT: Update inspection
+  //Returns 200 if successful, 400 if there is an error.
+  async updateInspection(inspection: Inspection) {
+    try {
+      const docRef = doc(db, "inspections", inspection.inspection_id);
+      await updateDoc(docRef, { ...inspection });
+      return { status: 200, inspection: inspection };
+    } catch (error) {
+      console.log(error);
+      return { status: 400 };
+    }
+  }
+
   //DELETE: Delete PRB
   //Returns 200 if successful, 400 if there is an error.
   async deletePRB(prb_id: string) {

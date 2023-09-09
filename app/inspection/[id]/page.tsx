@@ -7,7 +7,7 @@ import ReschedulingRequest from "@/components/ReschedulingRequest";
 import IMWPR from "@/components/Tasks/IMWPR";
 import NIM from "@/components/Tasks/NIM";
 import PendingWaiting from "@/components/Tasks/PendingWaiting";
-import ScheduleApproval from "@/components/Tasks/ScheduleApproval";
+import { ScheduleApproval } from "@/components/Tasks/ScheduleApproval";
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import { BsPencil, BsX } from "react-icons/bs";
@@ -15,6 +15,8 @@ import { RiArrowDownSFill, RiSearchLine } from "react-icons/ri";
 import Firebase from "@/lib/firebase";
 import { Inspection } from "@/types/Inspection";
 import { Client } from "@/types/Client";
+import { useSession } from "next-auth/react";
+import { Log } from "@/types/Log";
 const firebase = new Firebase();
 
 export default function Page({ params }: { params: { id: string } }) {
@@ -23,6 +25,7 @@ export default function Page({ params }: { params: { id: string } }) {
   const [showRescheduleModal, setShowRescheduleModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
+  const { data }: any = useSession();
   const [inspectionData, setInspectionData] = useState<Inspection>(
     {} as Inspection
   );
@@ -86,6 +89,88 @@ export default function Page({ params }: { params: { id: string } }) {
       setShowRescheduleModal(false);
       setIsLoading(false);
     }, 2000);
+  };
+
+  const handleScheduleApproval = async (
+    decision: Number,
+    newDate: string,
+    reason: string
+  ) => {
+    if (decision == 2 && (newDate == "" || reason == ""))
+      return alert("Please fill out all fields.");
+    if (!data) return;
+    setIsLoading(true);
+
+    let inspection: Inspection = {} as Inspection;
+    let log: Log = {} as Log;
+    if (decision == 1) {
+      //Approved
+      //1.) Create log
+      log = {
+        log_id: "",
+        timestamp: new Date().toLocaleString(),
+        client_details: inspectionData.client_details as Client,
+        author_details: inspectionData.prb_details,
+        action: "Accomplished Scheduling",
+        author_type: "",
+        author_id: "",
+      };
+
+      //2.) Update inspection
+      if (
+        new Date(inspectionData.inspection_date).getFullYear() ==
+        new Date().getFullYear()
+      ) {
+        //If inspection date is succeeding year, set inspection status to "Approved"
+        inspection = {
+          ...inspectionData,
+          inspection_task: "For inspection recommendation",
+          //If the inspection task is "Scheduling - RO <date/reason>", get the date and set it as the inspection date
+          inspection_date: inspectionData.inspection_task.includes("<")
+            ? inspectionData.inspection_task.split("<")[1].split("/")[0]
+            : inspectionData.inspection_date,
+        };
+      } else {
+        //Else, set inspection status to "For inspection recommendation"
+        inspection = {
+          ...inspectionData,
+          status: "Approved",
+          inspection_task: "For NIM",
+          //If the inspection task is "Scheduling - RO <date/reason>", get the date and set it as the inspection date
+          inspection_date: inspectionData.inspection_task.includes("<")
+            ? inspectionData.inspection_task.split("<")[1].split("/")[0]
+            : inspectionData.inspection_date,
+        };
+      }
+    } else if (decision == 2) {
+      //Negotiate
+      //1.) Create log
+      log = {
+        log_id: "",
+        timestamp: new Date().toLocaleString(),
+        client_details: inspectionData.client_details as Client,
+        author_details: inspectionData.prb_details,
+        action:
+          "Scheduled a new inspection date at " +
+          newDate +
+          "for the reason of: " +
+          reason,
+        author_type: "",
+        author_id: "",
+      };
+
+      //2.) Update inspection
+      inspection = {
+        ...inspectionData,
+        inspection_task: `Scheduling - RO <${newDate}/${reason}>`,
+      };
+    }
+
+    console.log(log);
+    await firebase.createLog(log, data.prb_id);
+    await firebase.updateInspection(inspection);
+    setInspectionData(inspection);
+    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -179,6 +264,14 @@ export default function Page({ params }: { params: { id: string } }) {
             </div>
             <div className="flex flex-col gap-1">
               <h6 className="font-monts text-sm font-semibold text-darkGray">
+                RO Assigned
+              </h6>
+              <p className="font-monts text-sm font-semibold text-darkerGray">
+                {inspectionData.ro_details.office}
+              </p>
+            </div>
+            <div className="flex flex-col gap-1">
+              <h6 className="font-monts text-sm font-semibold text-darkGray">
                 Email
               </h6>
               <p className="font-monts text-sm font-semibold text-primaryBlue hover:underline">
@@ -195,18 +288,10 @@ export default function Page({ params }: { params: { id: string } }) {
             </div>
             <div className="flex flex-col gap-1">
               <h6 className="font-monts text-sm font-semibold text-darkGray">
-                Date Issued
-              </h6>
-              <p className="font-monts text-sm font-semibold text-darkerGray">
-                {inspectionData.createdAt}
-              </p>
-            </div>
-            <div className="flex flex-col gap-1">
-              <h6 className="font-monts text-sm font-semibold text-darkGray">
                 Inspection Date
               </h6>
               <p className="font-monts text-sm font-semibold text-darkerGray">
-                {inspectionData.inspection_task == "Scheduling"
+                {inspectionData.inspection_task.includes("Scheduling")
                   ? "TBD"
                   : inspectionData.inspection_date}
               </p>
@@ -247,17 +332,32 @@ export default function Page({ params }: { params: { id: string } }) {
             </div>
           )}
 
-        {task == "scheduling - PRB" ? (
-          <ScheduleApproval />
-        ) : task == "imwpr" ? (
+        {task.includes("scheduling - prb") ? (
+          <ScheduleApproval
+            requestedDate={
+              //If the inspection task is "Scheduling - PRB <date/reason>", get the date
+              inspectionData.inspection_task.includes("<")
+                ? inspectionData.inspection_task.split("<")[1].split("/")[0]
+                : ""
+            }
+            reason={
+              //If the inspection task is "Scheduling - PRB <date/reason>", get the reason
+              inspectionData.inspection_task.includes("<")
+                ? inspectionData.inspection_task.split("<")[1].split("/")[1]
+                : ""
+            }
+            decision={handleScheduleApproval}
+            isLoading={isLoading}
+          />
+        ) : task.includes("imwpr") ? (
           <IMWPR />
-        ) : task == "send nim" ? (
+        ) : task.includes("send nim") ? (
           <NIM />
-        ) : task == "review inspection requirements" ? (
+        ) : task.includes("review inspection requirements") ? (
           //To follow interface where the client can upload the requirements
           <></>
         ) : (
-          <PendingWaiting />
+          <PendingWaiting task={task} />
         )}
       </div>
     </>

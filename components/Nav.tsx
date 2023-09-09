@@ -11,7 +11,7 @@ import { useInspections } from "@/contexts/InspectionContext";
 export default function Nav() {
   const [toggle, setToggle] = useState(false);
   const [showAddInspectionModal, setShowAddInspectionModal] = useState(false);
-  const { inspections, setInspections } = useInspections();
+  const { setInspections } = useInspections();
 
   return (
     <>
