@@ -19,7 +19,7 @@ export default function AddNewInspection({
   updateInspections,
 }: any) {
   const firebase = new Firebase();
-  const { data } : any = useSession();
+  const { data }: any = useSession();
 
   //Loaders
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -33,6 +33,8 @@ export default function AddNewInspection({
   const [date, setDate] = useState("");
   const [mode, setMode] = useState("Virtual");
   const [RO, setRO] = useState("");
+  const [OC, setOC] = useState<OC>({} as OC);
+  const [ACD, setACD] = useState<ACD>({} as ACD);
   const [client, setClient] = useState("New client");
 
   //New client form values
@@ -52,6 +54,16 @@ export default function AddNewInspection({
         .catch((err) => {
           console.log(err);
         });
+
+      firebase.getOneACD().then((res) => {
+        if (res == null) return;
+        setACD(res);
+      });
+
+      firebase.getOneOC().then((res) => {
+        if (res == null) return;
+        setOC(res);
+      });
     }
 
     if (clientList.length == 0) {
@@ -150,8 +162,9 @@ export default function AddNewInspection({
       client_details: newClient as Client,
       ro_details: regionalOffices.find((r) => r.ro_id == RO) as RO,
       prb_details: prb,
-      acd_details: {} as ACD,
-      oc_details: {} as OC,
+      //Get first ACD and OC
+      acd_details: ACD,
+      oc_details: OC,
       status: "Pending",
     };
 

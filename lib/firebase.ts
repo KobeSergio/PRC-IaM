@@ -210,6 +210,42 @@ export default class Firebase {
     }
   }
 
+  //GET: Gets one ACD account to be used on inspection creation. (This could be enhanced wherein a load balancer is used to distribute the ACD to be assigned)
+  //Returns acd if successful, null if there is an error.
+  async getOneACD() {
+    try {
+      const querySnapshot = await getDocs(acdRef);
+      if (querySnapshot.empty) {
+        console.log("No matching documents.");
+        return null;
+      }
+      for (const doc of querySnapshot.docs) {
+        return doc.data() as ACD;
+      }
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  }
+
+  //GET: Gets one OC account to be used on inspection creation. (This could be enhanced wherein a load balancer is used to distribute the OC to be assigned)
+  //Returns OC if successful, null if there is an error.
+  async getOneOC() {
+    try {
+      const querySnapshot = await getDocs(ocRef);
+      if (querySnapshot.empty) {
+        console.log("No matching documents.");
+        return null;
+      }
+      for (const doc of querySnapshot.docs) {
+        return doc.data() as OC;
+      }
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  }
+
   //GET: Get single ro.
   //Returns ro if successful, null if there is an error.
   async getRODetails(ro_id: string) {

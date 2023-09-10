@@ -44,12 +44,9 @@ export default function Page({ params }: { params: { id: string } }) {
     }
   }, [params.id]);
 
-  const handleCloseEditInspection = () => {
-    setShowEditInspectionModal(false);
-  };
-
   const handleSubmitEditClient = async (new_client_details: Client) => {
     //insert logic here
+    if (!new_client_details) return alert("Please fill out all fields.");
     setIsLoading(true);
 
     await firebase.updateClient(new_client_details).then(() => {
@@ -63,32 +60,109 @@ export default function Page({ params }: { params: { id: string } }) {
     setIsLoading(false);
   };
 
-  const handleCloseCancellationRequest = () => {
+  const handleSubmitCancellationRequest = async (
+    reason: string,
+    remarks: string
+  ) => {
+    //System shall allow the cancellation, if 1 is selected, must be at least seven (7) days before the day of inspection. If 2 is selected, at least one (1) month prior to the scheduled date of inspection.
+    if (reason != "others") {
+      const today = new Date();
+      const inspectionDate = new Date(inspectionData.inspection_date);
+      if (inspectionDate.getTime() - today.getTime() < 7 * 24 * 60 * 60 * 1000)
+        return alert(
+          "Inspection is scheduled within the next 7 days, the system shall not allow the cancellation of inspection."
+        );
+    } else {
+      //2.) If 1 is selected, must be at least seven (7) days before the day of inspection. If 2 is selected, at least one (1) month prior to the scheduled date of inspection.
+      const today = new Date();
+      const inspectionDate = new Date(inspectionData.inspection_date);
+      if (inspectionDate.getTime() - today.getTime() < 30 * 24 * 60 * 60 * 1000)
+        return alert(
+          "For other reasons, inspection is scheduled within the next 30 days, the system shall not allow the cancellation of inspection"
+        );
+    }
+
+    if (!reason || !remarks) return alert("Please fill out all fields.");
+    if (
+      !confirm(
+        "Are you sure you want to request for cancellation? This action can't be undone."
+      )
+    ) {
+      return;
+    }
+
+    setIsLoading(true);
+
+    let inspection: Inspection = {} as Inspection;
+    let log: Log = {} as Log;
+
+    //1.) Create log
+    log = {
+      log_id: "",
+      timestamp: new Date().toLocaleString(),
+      client_details: inspectionData.client_details as Client,
+      author_details: inspectionData.prb_details,
+      action: "Requested for cancellation due to " + reason + ": " + remarks,
+      author_type: "",
+      author_id: "",
+    };
+
+    const currentInspectionTask = inspection.inspection_task;
+    //2.) Update inspection
+    inspection = {
+      ...inspectionData,
+      inspection_task: `For cancellation recommendation <${reason}/${remarks}/${currentInspectionTask}>`,
+    };
+
+    await firebase.createLog(log, data.prb_id);
+    await firebase.updateInspection(inspection);
+    setInspectionData(inspection);
     setShowCancellationModal(false);
+    setIsLoading(false);
   };
 
-  const handleSubmitCancellationRequest = () => {
-    //insert logic here
+  const handleSubmitReschedulingRequest = async (
+    date: string,
+    reason: string
+  ) => {
+    if (!date || !reason) return alert("Please fill out all fields.");
+    if (
+      !confirm(
+        "Are you sure you want to request for rescheduling? This action can't be undone."
+      )
+    ) {
+      return;
+    }
+
     setIsLoading(true);
 
-    setTimeout(() => {
-      setShowCancellationModal(false);
-      setIsLoading(false);
-    }, 2000);
-  };
+    let inspection: Inspection = {} as Inspection;
+    let log: Log = {} as Log;
 
-  const handleCloseReschedulingRequest = () => {
+    //1.) Create log
+    log = {
+      log_id: "",
+      timestamp: new Date().toLocaleString(),
+      client_details: inspectionData.client_details as Client,
+      author_details: inspectionData.prb_details,
+      action:
+        "Requested for rescheduling to be on " + date + " due to " + reason,
+      author_type: "",
+      author_id: "",
+    };
+
+    //2.) Update inspection
+    inspection = {
+      ...inspectionData,
+      inspection_task: `Scheduling - RO <${date}/${reason}>`,
+    };
+
+    await firebase.createLog(log, data.prb_id);
+    await firebase.updateInspection(inspection);
+
+    setInspectionData(inspection);
     setShowRescheduleModal(false);
-  };
-
-  const handleSubmitReschedulingRequest = () => {
-    //insert logic here
-    setIsLoading(true);
-
-    setTimeout(() => {
-      setShowRescheduleModal(false);
-      setIsLoading(false);
-    }, 2000);
+    setIsLoading(false);
   };
 
   const handleScheduleApproval = async (
@@ -203,20 +277,20 @@ export default function Page({ params }: { params: { id: string } }) {
     <>
       <EditClient
         isOpen={showEditInspectionModal}
-        setter={handleCloseEditInspection}
+        setter={() => setShowEditInspectionModal(false)}
         isLoading={isLoading}
         onSubmit={handleSubmitEditClient}
         client_details={inspectionData.client_details}
       />
       <CancellationRequest
         isOpen={showCancellationModal}
-        setter={handleCloseCancellationRequest}
+        setter={() => setShowCancellationModal(false)}
         isLoading={isLoading}
         onSubmit={handleSubmitCancellationRequest}
       />
       <ReschedulingRequest
         isOpen={showRescheduleModal}
-        setter={handleCloseReschedulingRequest}
+        setter={() => setShowRescheduleModal(false)}
         isLoading={isLoading}
         onSubmit={handleSubmitReschedulingRequest}
       />
@@ -315,13 +389,20 @@ export default function Page({ params }: { params: { id: string } }) {
               .toLowerCase()
               .includes("recommendation")) && (
             <div className="flex flex-row flex-wrap justify-end gap-2">
-              <button
-                type="button"
-                onClick={() => setShowRescheduleModal(true)}
-                className="w-full md:w-fit flex items-center justify-center gap-2 cursor-pointer text-gray border bg-primaryBlue border-primaryBlue rounded-lg font-monts font-semibold text-sm text-white h-fit p-2.5"
-              >
-                Request for rescheduling
-              </button>
+              {
+                //If inspection date is 45 days left, do not show reschedule button
+                new Date(inspectionData.inspection_date).getTime() -
+                  new Date().getTime() >
+                  45 * 24 * 60 * 60 * 1000 && (
+                  <button
+                    type="button"
+                    onClick={() => setShowRescheduleModal(true)}
+                    className="w-full md:w-fit flex items-center justify-center gap-2 cursor-pointer text-gray border bg-primaryBlue border-primaryBlue rounded-lg font-monts font-semibold text-sm text-white h-fit p-2.5"
+                  >
+                    Request for rescheduling
+                  </button>
+                )
+              }
               <button
                 type="button"
                 onClick={() => setShowCancellationModal(true)}
