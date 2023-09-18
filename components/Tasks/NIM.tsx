@@ -1,16 +1,16 @@
 import React, { useState } from "react";
-import Spinner from "../Spinner";
+import { Spinner } from "../Spinner";
 
 export default function NIM() {
-    const [isLoading, setIsLoading] = useState(false);
-    const handleSendNIM = () => {
-        //insert logic here
-        setIsLoading(true);
-    
-        setTimeout(() => {
-          setIsLoading(false);
-        }, 2000);
-      };
+  const [isLoading, setIsLoading] = useState(false);
+  const handleSendNIM = () => {
+    //insert logic here
+    setIsLoading(true);
+
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 2000);
+  };
   return (
     <div className="h-full lg:h-[45vh] bg-white border border-[#D5D7D8] flex flex-col rounded-[10px] p-6 gap-2">
       <h1 className="font-monts font-bold text-lg text-darkerGray underline">
@@ -179,22 +179,22 @@ export default function NIM() {
         </form>
         <hr className="w-full border-[#D5D7D8]"></hr>
         <div className="flex justify-end">
-        <button
-          className={`${
-            isLoading ? "flex items-center gap-0.5" : ""
-          } py-2 px-4 font-monts font-semibold text-sm text-white bg-[#3C6497] rounded-lg outline-none`}
-          type="button"
-          onClick={handleSendNIM}
-        >
-          {isLoading ? (
-            <>
-              <Spinner />
-              Sending NIM to client...
-            </>
-          ) : (
-            "Send NIM to client"
-          )}
-        </button>
+          <button
+            className={`${
+              isLoading ? "flex items-center gap-0.5" : ""
+            } py-2 px-4 font-monts font-semibold text-sm text-white bg-[#3C6497] rounded-lg outline-none`}
+            type="button"
+            onClick={handleSendNIM}
+          >
+            {isLoading ? (
+              <>
+                <Spinner />
+                Sending NIM to client...
+              </>
+            ) : (
+              "Send NIM to client"
+            )}
+          </button>
         </div>
       </div>
     </div>

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Spinner from "../Spinner";
+import { Spinner } from "../Spinner";
 
 export default function IMWPR() {
   const [isLoading, setIsLoading] = useState(false);

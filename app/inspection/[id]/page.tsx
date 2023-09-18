@@ -111,7 +111,9 @@ export default function Page({ params }: { params: { id: string } }) {
     //2.) Update inspection
     inspection = {
       ...inspectionData,
-      inspection_task: `For cancellation recommendation <${reason}/${remarks}/${currentInspectionTask}>`,
+      inspection_task: `For cancellation recommendation <${reason}/${remarks}/${currentInspectionTask}/${formatDateToDash(
+        new Date(Date.now() + 2 * 24 * 60 * 60 * 1000)
+      )}>`,
     };
 
     await firebase.createLog(log, data.prb_id);
@@ -154,7 +156,9 @@ export default function Page({ params }: { params: { id: string } }) {
     //2.) Update inspection
     inspection = {
       ...inspectionData,
-      inspection_task: `Scheduling - RO <${date}/${reason}>`,
+      inspection_task: `Scheduling - RO <${date}/${reason}/${formatDateToDash(
+        new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
+      )}>`,
     };
 
     await firebase.createLog(log, data.prb_id);
@@ -198,7 +202,9 @@ export default function Page({ params }: { params: { id: string } }) {
         //If inspection date is succeeding year, set inspection status to "Approved"
         inspection = {
           ...inspectionData,
-          inspection_task: "For inspection recommendation",
+          inspection_task: `For inspection recommendation <${formatDateToDash(
+            new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
+          )}>`,
           //If the inspection task is "Scheduling - RO <date/reason>", get the date and set it as the inspection date
           inspection_date: inspectionData.inspection_task.includes("<")
             ? inspectionData.inspection_task.split("<")[1].split("/")[0]
@@ -209,8 +215,10 @@ export default function Page({ params }: { params: { id: string } }) {
         inspection = {
           ...inspectionData,
           status: "Approved",
-          inspection_task: "For NIM",
-          //If the inspection task is "Scheduling - RO <date/reason>", get the date and set it as the inspection date
+          inspection_task: `For NIM <${formatDateToDash(
+            new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
+          )}>`,
+          //If the inspection task is "Scheduling - RO <newDate/reason/currDate>", get the date and set it as the inspection date
           inspection_date: inspectionData.inspection_task.includes("<")
             ? inspectionData.inspection_task.split("<")[1].split("/")[0]
             : inspectionData.inspection_date,
@@ -236,11 +244,12 @@ export default function Page({ params }: { params: { id: string } }) {
       //2.) Update inspection
       inspection = {
         ...inspectionData,
-        inspection_task: `Scheduling - RO <${newDate}/${reason}>`,
+        inspection_task: `Scheduling - RO <${newDate}/${reason}/${formatDateToDash(
+          new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
+        )}>`,
       };
     }
 
-    console.log(log);
     await firebase.createLog(log, data.prb_id);
     await firebase.updateInspection(inspection);
     setInspectionData(inspection);
@@ -443,4 +452,11 @@ export default function Page({ params }: { params: { id: string } }) {
       </div>
     </>
   );
+}
+
+function formatDateToDash(dateObj: Date) {
+  const year = dateObj.getFullYear();
+  const month = String(dateObj.getMonth() + 1).padStart(2, "0"); // Months are 0-based
+  const day = String(dateObj.getDate()).padStart(2, "0");
+  return `${year}-${day}-${month}`;
 }
