@@ -12,7 +12,7 @@ export default function NIM() {
     }, 2000);
   };
   return (
-    <div className="h-full lg:h-[45vh] bg-white border border-[#D5D7D8] flex flex-col rounded-[10px] p-6 gap-2">
+    <div className="h-full bg-white border border-[#D5D7D8] flex flex-col rounded-[10px] p-6 gap-2">
       <h1 className="font-monts font-bold text-lg text-darkerGray underline">
         Inspection Task - NIM
       </h1>
@@ -23,7 +23,7 @@ export default function NIM() {
           submit.
         </h6>
         <hr className="w-full border-[#D5D7D8]"></hr>
-        <form className="h-full lg:h-[23vh] flex flex-col gap-2 overflow-auto">
+        <div className="h-full  flex flex-col gap-4  ml-3 my-2">
           <div className="flex flex-row items-start lg:items-center gap-2">
             <input
               id="checkbox1"
@@ -31,7 +31,7 @@ export default function NIM() {
               title="s"
               value=""
               type="checkbox"
-              className="cursor-pointer accent-primaryBlue"
+              className="cursor-pointer accent-primaryBlue w-[1.5rem] h-[1.5rem]"
             />
 
             <label
@@ -50,7 +50,7 @@ export default function NIM() {
               title="s"
               value=""
               type="checkbox"
-              className="cursor-pointer accent-primaryBlue"
+              className="cursor-pointer accent-primaryBlue w-[1.5rem] h-[1.5rem]"
             />
 
             <label
@@ -69,7 +69,7 @@ export default function NIM() {
               title="s"
               value=""
               type="checkbox"
-              className="cursor-pointer accent-primaryBlue"
+              className="cursor-pointer accent-primaryBlue w-[1.5rem] h-[1.5rem]"
             />
 
             <label
@@ -88,7 +88,7 @@ export default function NIM() {
               title="s"
               value=""
               type="checkbox"
-              className="cursor-pointer accent-primaryBlue"
+              className="cursor-pointer accent-primaryBlue w-[1.5rem] h-[1.5rem]"
             />
 
             <label
@@ -107,7 +107,7 @@ export default function NIM() {
               title="s"
               value=""
               type="checkbox"
-              className="cursor-pointer accent-primaryBlue"
+              className="cursor-pointer accent-primaryBlue w-[1.5rem] h-[1.5rem]"
             />
 
             <label
@@ -126,7 +126,7 @@ export default function NIM() {
               title="s"
               value=""
               type="checkbox"
-              className="cursor-pointer accent-primaryBlue"
+              className="cursor-pointer accent-primaryBlue w-[1.5rem] h-[1.5rem]"
             />
 
             <label
@@ -145,7 +145,7 @@ export default function NIM() {
               title="s"
               value=""
               type="checkbox"
-              className="cursor-pointer accent-primaryBlue"
+              className="cursor-pointer accent-primaryBlue w-[1.5rem] h-[1.5rem]"
             />
 
             <label
@@ -164,7 +164,7 @@ export default function NIM() {
               title="s"
               value=""
               type="checkbox"
-              className="cursor-pointer accent-primaryBlue"
+              className="cursor-pointer accent-primaryBlue w-[1.5rem] h-[1.5rem]"
             />
 
             <label
@@ -176,13 +176,13 @@ export default function NIM() {
               presented (ACD-IAM-04)
             </label>
           </div>
-        </form>
+        </div>
         <hr className="w-full border-[#D5D7D8]"></hr>
         <div className="flex justify-end">
           <button
             className={`${
               isLoading ? "flex items-center gap-0.5" : ""
-            } py-2 px-4 font-monts font-semibold text-sm text-white bg-[#3C6497] rounded-lg outline-none`}
+            } py-2 px-4 font-monts font-semibold text-sm text-white bg-[#3C6497] rounded-lg outline-none mt-2`}
             type="button"
             onClick={handleSendNIM}
           >
