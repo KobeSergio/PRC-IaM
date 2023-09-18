@@ -24,6 +24,11 @@ export default function PendingWaiting({ task }: any) {
     taskContent = "This inspection has been cancelled.";
   }
 
+  if (task.toLowerCase().includes("sent nim")) {
+    taskContent =
+      "NIM has been sent to the client. Waiting for the requirements from the client";
+  }
+
   return (
     <div className="h-fit lg:h-[45vh] bg-white border border-[#D5D7D8] flex flex-col rounded-[10px] p-6 gap-2">
       <h1 className="font-monts font-bold text-lg text-darkerGray underline">

@@ -441,8 +441,11 @@ export default function Page({ params }: { params: { id: string } }) {
           />
         ) : task.includes("imwpr") ? (
           <IMWPR />
-        ) : task.includes("nim") ? (
-          <NIM />
+        ) : task.includes("for nim") ? (
+          <NIM
+            inspectionDetails={inspectionData}
+            setInspectionData={setInspectionData}
+          />
         ) : task.includes("review inspection requirements") ? (
           //To follow interface where the client can upload the requirements
           <></>

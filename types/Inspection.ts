@@ -22,4 +22,5 @@ export type Inspection = {
   client_details: Client;
   ro_details: RO;
   status: string;
+  requirements: {};
 };

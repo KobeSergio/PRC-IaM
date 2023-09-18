@@ -166,6 +166,7 @@ export default function AddNewInspection({
       acd_details: ACD,
       oc_details: OC,
       status: "Pending",
+      requirements: {},
     };
 
     const log: Log = {

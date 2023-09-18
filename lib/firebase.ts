@@ -29,6 +29,7 @@ import { Log } from "@/types/Log";
 import { OC } from "@/types/OC";
 import { PRB } from "@/types/PRB";
 import { ACD } from "@/types/ACD";
+import { ExpiringLink } from "@/types/ExpiringLink";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -404,6 +405,25 @@ export default class Firebase {
     } catch (error) {
       console.log(error);
       return [];
+    }
+  }
+
+  //POST: Create an ExpiringLink object.
+  //Returns 200 if successful, 400 if there is an error.
+  async createExpiringLink(inspection_id: string) {
+    try {
+      const docRef = await addDoc(collection(db, "expiring_links"), {
+        inspection_id: inspection_id,
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), //7 days from now
+        created_at: DATE_NOW,
+      });
+      await updateDoc(docRef, {
+        expiring_link_id: docRef.id,
+      });
+      return { status: 200, expiring_link_id: docRef.id };
+    } catch (error) {
+      console.log(error);
+      return { status: 400 };
     }
   }
 
