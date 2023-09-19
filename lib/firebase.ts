@@ -414,7 +414,7 @@ export default class Firebase {
     try {
       const docRef = await addDoc(collection(db, "expiring_links"), {
         inspection_id: inspection_id,
-        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), //7 days from now
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleString(), //7 days from now
         created_at: DATE_NOW,
       });
       await updateDoc(docRef, {

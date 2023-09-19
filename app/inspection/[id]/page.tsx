@@ -17,6 +17,7 @@ import { Inspection } from "@/types/Inspection";
 import { Client } from "@/types/Client";
 import { useSession } from "next-auth/react";
 import { Log } from "@/types/Log";
+import CheckRequirements from "@/components/Tasks/CheckRequirements";
 const firebase = new Firebase();
 
 export default function Page({ params }: { params: { id: string } }) {
@@ -256,6 +257,45 @@ export default function Page({ params }: { params: { id: string } }) {
     setIsLoading(false);
   };
 
+  const handleCheckRequirements = async () => {
+    if (
+      !confirm("Are you sure you want to proceed? This action can't be undone.")
+    ) {
+      return;
+    }
+
+    setIsLoading(true);
+
+    let inspection: Inspection = {} as Inspection;
+    let log: Log = {} as Log;
+
+    //1.) Create log
+    log = {
+      log_id: "",
+      timestamp: new Date().toLocaleString(),
+      client_details: inspectionData.client_details as Client,
+      author_details: inspectionData.prb_details,
+      action: "Reviewed inspection requirements",
+      author_type: "",
+      author_id: "",
+    };
+
+    //2.) Update inspection
+    inspection = {
+      ...inspectionData,
+      inspection_task: `For TO <${formatDateToDash(
+        new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
+      )}>`,
+    };
+
+    await firebase.createLog(log, data.prb_id);
+    await firebase.updateInspection(inspection);
+
+    setInspectionData(inspection);
+    setShowRescheduleModal(false);
+    setIsLoading(false);
+  };
+
   useEffect(() => {
     const body = document.querySelector("body");
     if (body) {
@@ -448,7 +488,11 @@ export default function Page({ params }: { params: { id: string } }) {
           />
         ) : task.includes("review inspection requirements") ? (
           //To follow interface where the client can upload the requirements
-          <></>
+          <CheckRequirements
+            requirements={inspectionData.requirements}
+            handleCheckRequirements={handleCheckRequirements}
+            isLoading={isLoading}
+          />
         ) : (
           <PendingWaiting task={task} />
         )}

@@ -36,7 +36,7 @@ export default function Dashboard() {
       inspection.inspection_task.includes("Scheduling - PRB") ||
       inspection.inspection_task.includes("IMAT") ||
       inspection.inspection_task.includes("NIM") ||
-      inspection.inspection_task.includes("VS") ||
+      inspection.inspection_task.includes("Review Inspection Requirements") ||
       inspection.inspection_task.includes("IMWPR")
   );
 
@@ -59,7 +59,7 @@ export default function Dashboard() {
             inspection.inspection_task.includes("Scheduling - PRB") ||
             inspection.inspection_task.includes("IMAT") ||
             inspection.inspection_task.includes("NIM") ||
-            inspection.inspection_task.includes("VS") ||
+            inspection.inspection_task.includes("Review Inspection Requirements") ||
             inspection.inspection_task.includes("IMWPR")
         )
       );
@@ -85,7 +85,7 @@ export default function Dashboard() {
   //Get number of inspections where inspection_task is Scheduling, NIM, VS, and IMWPR
   const [scheduling, setScheduling] = useState(0);
   const [nim, setNim] = useState(0);
-  const [vs, setVs] = useState(0);
+  const [vr, setVr] = useState(0);
   const [imwpr, setImwpr] = useState(0);
 
   useEffect(() => {
@@ -97,16 +97,17 @@ export default function Dashboard() {
       const _nim = filteredInspections.filter((inspection) =>
         inspection.inspection_task.includes("NIM")
       ).length;
-      const _vs = filteredInspections.filter((inspection) =>
-        inspection.inspection_task.includes("VS")
+      const _vr = filteredInspections.filter((inspection) =>
+        inspection.inspection_task.includes("Review Inspection Requirements")
       ).length;
       const _imwpr = filteredInspections.filter((inspection) =>
         inspection.inspection_task.includes("IMWPR")
       ).length;
 
+
       setScheduling(_scheduling);
       setNim(_nim);
-      setVs(_vs);
+      setVr(_vr);
       setImwpr(_imwpr);
 
       const uniqueYears = new Set(
@@ -174,7 +175,7 @@ export default function Dashboard() {
                 (inspection.inspection_task.includes("Scheduling - PRB") ||
                   inspection.inspection_task.includes("IMAT") ||
                   inspection.inspection_task.includes("NIM") ||
-                  inspection.inspection_task.includes("VS") ||
+                  inspection.inspection_task.includes("Review Inspection Requirements") ||
                   inspection.inspection_task.includes("IMWPR"))
             )
           );
@@ -221,7 +222,7 @@ export default function Dashboard() {
                   PRB Tasks
                 </h1>
                 <h3 className="font-monts font-semibold text-base text-darkerGray">
-                  {scheduling + nim + vs + imwpr} total,{" "}
+                  {scheduling + nim + vr + imwpr} total,{" "}
                   <span className="font-medium">proceed to resolve them</span>
                 </h3>
                 <div className="w-full flex flex-row justify-between gap-5 mt-5">
@@ -231,17 +232,17 @@ export default function Dashboard() {
                     </h6>
                     <div className="flex flex-row justify-between font-monts text-sm">
                       <p className="font-medium">Scheduling</p>
-                      <p className="font-semibold">{scheduling}</p>
+                      <p className="font-semibold ml-2">{scheduling}</p>
                     </div>
                     <div className="flex flex-row justify-between font-monts text-sm">
                       <p className="font-medium">
                         Notice of Inspection and Monitoring (NIM)
                       </p>
-                      <p className="font-semibold">{nim}</p>
+                      <p className="font-semibold ml-2">{nim}</p>
                     </div>
                     <div className="flex flex-row justify-between font-monts text-sm">
-                      <p className="font-medium">Verification Statement (VS)</p>
-                      <p className="font-semibold">{vs}</p>
+                      <p className="font-medium">Review Inspection Requirements </p>
+                      <p className="font-semibold ml-2">{vr}</p>
                     </div>
                   </div>
                   <div className="w-1/2 flex flex-col gap-3">
@@ -253,7 +254,7 @@ export default function Dashboard() {
                         Inspection and Monitoring Work Program and Report
                         (IMWPR)
                       </p>
-                      <p className="font-semibold">{imwpr}</p>
+                      <p className="font-semibold ml-2">{imwpr}</p>
                     </div>
                   </div>
                 </div>
