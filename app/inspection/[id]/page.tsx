@@ -257,37 +257,48 @@ export default function Page({ params }: { params: { id: string } }) {
     setIsLoading(false);
   };
 
-  const handleCheckRequirements = async () => {
-    if (
-      !confirm("Are you sure you want to proceed? This action can't be undone.")
-    ) {
-      return;
-    }
-
-    setIsLoading(true);
-
+  const handleCheckRequirements = async (decision: Number) => {
     let inspection: Inspection = {} as Inspection;
     let log: Log = {} as Log;
 
-    //1.) Create log
-    log = {
-      log_id: "",
-      timestamp: new Date().toLocaleString(),
-      client_details: inspectionData.client_details as Client,
-      author_details: inspectionData.prb_details,
-      action: "Reviewed inspection requirements",
-      author_type: "",
-      author_id: "",
-    };
+    if (decision == 1) {
+      //1.) Create log
+      log = {
+        log_id: "",
+        timestamp: new Date().toLocaleString(),
+        client_details: inspectionData.client_details as Client,
+        author_details: inspectionData.prb_details,
+        action: "Reviewed inspection requirements",
+        author_type: "",
+        author_id: "",
+      };
 
-    //2.) Update inspection
-    inspection = {
-      ...inspectionData,
-      inspection_task: `For TO <${formatDateToDash(
-        new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
-      )}>`,
-    };
+      //2.) Update inspection
+      inspection = {
+        ...inspectionData,
+        inspection_task: `For TO <${formatDateToDash(
+          new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)
+        )}>`,
+      };
+    } else {
+      //1.) Create log
+      log = {
+        log_id: "",
+        timestamp: new Date().toLocaleString(),
+        client_details: inspectionData.client_details as Client,
+        author_details: inspectionData.prb_details,
+        action: "Cancelled inspection due to missing requirements",
+        author_type: "",
+        author_id: "",
+      };
 
+      //2.) Update inspection
+      inspection = {
+        ...inspectionData,
+        inspection_task: `Inspection Cancelled`,
+        status: "Cancelled",
+      };
+    }
     await firebase.createLog(log, data.prb_id);
     await firebase.updateInspection(inspection);
 
@@ -492,6 +503,8 @@ export default function Page({ params }: { params: { id: string } }) {
             requirements={inspectionData.requirements}
             handleCheckRequirements={handleCheckRequirements}
             isLoading={isLoading}
+            client_email={inspectionData.client_details.email}
+            setIsLoading={setIsLoading}
           />
         ) : (
           <PendingWaiting task={task} />

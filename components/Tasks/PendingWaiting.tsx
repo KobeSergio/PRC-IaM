@@ -29,6 +29,10 @@ export default function PendingWaiting({ task }: any) {
       "NIM has been sent to the client. Waiting for the requirements from the client";
   }
 
+  if (task.toLowerCase().includes("for to")) {
+    taskContent = "Waiting for the travel order to be uploaded by the ACD";
+  }
+
   return (
     <div className="h-fit lg:h-[45vh] bg-white border border-[#D5D7D8] flex flex-col rounded-[10px] p-6 gap-2">
       <h1 className="font-monts font-bold text-lg text-darkerGray underline">
