@@ -15,6 +15,7 @@ import { PRB } from "@/types/PRB";
 import { Log } from "@/types/Log";
 import { Inspection } from "@/types/Inspection";
 import { useSession } from "next-auth/react";
+import { formatDateToYYYYMMDD } from "@/lib/formatDates";
 ChartJS.register(ArcElement);
 
 export default function Dashboard() {
@@ -59,7 +60,9 @@ export default function Dashboard() {
             inspection.inspection_task.includes("Scheduling - PRB") ||
             inspection.inspection_task.includes("IMAT") ||
             inspection.inspection_task.includes("NIM") ||
-            inspection.inspection_task.includes("Review Inspection Requirements") ||
+            inspection.inspection_task.includes(
+              "Review Inspection Requirements"
+            ) ||
             inspection.inspection_task.includes("IMWPR")
         )
       );
@@ -103,7 +106,6 @@ export default function Dashboard() {
       const _imwpr = filteredInspections.filter((inspection) =>
         inspection.inspection_task.includes("IMWPR")
       ).length;
-
 
       setScheduling(_scheduling);
       setNim(_nim);
@@ -175,7 +177,9 @@ export default function Dashboard() {
                 (inspection.inspection_task.includes("Scheduling - PRB") ||
                   inspection.inspection_task.includes("IMAT") ||
                   inspection.inspection_task.includes("NIM") ||
-                  inspection.inspection_task.includes("Review Inspection Requirements") ||
+                  inspection.inspection_task.includes(
+                    "Review Inspection Requirements"
+                  ) ||
                   inspection.inspection_task.includes("IMWPR"))
             )
           );
@@ -241,7 +245,9 @@ export default function Dashboard() {
                       <p className="font-semibold ml-2">{nim}</p>
                     </div>
                     <div className="flex flex-row justify-between font-monts text-sm">
-                      <p className="font-medium">Review Inspection Requirements </p>
+                      <p className="font-medium">
+                        Review Inspection Requirements{" "}
+                      </p>
                       <p className="font-semibold ml-2">{vr}</p>
                     </div>
                   </div>
@@ -465,12 +471,4 @@ export default function Dashboard() {
       </div>
     </>
   );
-}
-
-function formatDateToYYYYMMDD(date: Date) {
-  const yyyy = date.getFullYear();
-  const mm = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-based, so +1 and pad with a leading 0 if necessary
-  const dd = String(date.getDate()).padStart(2, "0"); // Pad with a leading 0 if necessary
-
-  return `${yyyy}-${mm}-${dd}`;
 }
