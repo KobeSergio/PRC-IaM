@@ -4,14 +4,14 @@ import Breadcrumbs from "@/components/Breadcrumbs";
 import CancellationRequest from "@/components/Modals/CancellationRequest";
 import EditClient from "@/components/Modals/Dashboard/EditClient";
 import ReschedulingRequest from "@/components/ReschedulingRequest";
-import IMWPR from "@/components/Tasks/IMWPR";
+import IMWPRTask from "@/components/Tasks/IMWPR";
 import NIM from "@/components/Tasks/NIM";
 import PendingWaiting from "@/components/Tasks/PendingWaiting";
 import { ScheduleApproval } from "@/components/Tasks/ScheduleApproval";
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import { BsPencil, BsX } from "react-icons/bs";
-import { RiArrowDownSFill, RiSearchLine } from "react-icons/ri";
+import { IMWPR, IMWPRContent } from "@/types/IMWPR";
 import Firebase from "@/lib/firebase";
 import { Inspection } from "@/types/Inspection";
 import { Client } from "@/types/Client";
@@ -20,6 +20,8 @@ import { Log } from "@/types/Log";
 import CheckRequirements from "@/components/Tasks/CheckRequirements";
 import { extractFilenameFromFirebaseURL } from "@/lib/filenameExtractor";
 import { formatDateToDash } from "@/lib/formatDates";
+import InspectionSummary from "@/components/Tasks/InspectionSummary";
+
 const firebase = new Firebase();
 
 export default function Page({ params }: { params: { id: string } }) {
@@ -309,6 +311,48 @@ export default function Page({ params }: { params: { id: string } }) {
     setIsLoading(false);
   };
 
+  const handleIMWPRSubmission = async (IMWPR: any) => {
+    setIsLoading(true);
+    //1.) Create log
+    let log: Log = {} as Log;
+    log = {
+      log_id: "",
+      timestamp: new Date().toLocaleString(),
+      client_details: inspectionData.client_details as Client,
+      author_details: inspectionData.prb_details,
+      action: "Accomplished IMWPR",
+      author_type: "",
+      author_id: "",
+    };
+
+    //2.) Update inspection
+    let inspection: Inspection = {} as Inspection;
+
+    if (
+      //If there are remaining tasks from other parties
+      inspectionData.inspection_task.includes("IMAT")
+    ) {
+      inspection = {
+        ...inspectionData,
+        inspection_task: inspectionData.inspection_task.replace("IMWPR", ""),
+        inspection_IMWPR: IMWPR,
+        status: IMWPR.compliance_decision,
+      };
+    } else {
+      inspection = {
+        ...inspectionData,
+        inspection_task: "Inspection Finished",
+        inspection_IMWPR: IMWPR,
+        status: IMWPR.compliance_decision,
+      };
+    }
+
+    await firebase.createLog(log, data.prb_id);
+    await firebase.updateInspection(inspection);
+    setInspectionData(inspection);
+    setIsLoading(false);
+  };
+
   useEffect(() => {
     const body = document.querySelector("body");
     if (body) {
@@ -400,14 +444,6 @@ export default function Page({ params }: { params: { id: string } }) {
             </div>
             <div className="flex flex-col gap-1">
               <h6 className="font-monts text-sm font-semibold text-darkGray">
-                RO Assigned
-              </h6>
-              <p className="font-monts text-sm font-semibold text-darkerGray">
-                {inspectionData.ro_details.office}
-              </p>
-            </div>
-            <div className="flex flex-col gap-1">
-              <h6 className="font-monts text-sm font-semibold text-darkGray">
                 Email
               </h6>
               <p className="font-monts text-sm font-semibold text-primaryBlue hover:underline">
@@ -424,17 +460,25 @@ export default function Page({ params }: { params: { id: string } }) {
             </div>
             <div className="flex flex-col gap-1">
               <h6 className="font-monts text-sm font-semibold text-darkGray">
+                Date Issued
+              </h6>
+              <p className="font-monts text-sm font-semibold text-darkerGray">
+                {formatDateToDash(new Date(inspectionData.createdAt))}
+              </p>
+            </div>
+            <div className="flex flex-col gap-1">
+              <h6 className="font-monts text-sm font-semibold text-darkGray">
                 Inspection Date
               </h6>
               <p className="font-monts text-sm font-semibold text-darkerGray">
-                {inspectionData.inspection_task.includes("Scheduling")
+                {inspectionData.inspection_task == "Scheduling"
                   ? "TBD"
                   : inspectionData.inspection_date}
               </p>
             </div>
           </div>
-          {inspectionData.inspection_TO !== "" && (
-            <div className="flex w-full justify-end">
+          <div className="flex w-full justify-between mt-4">
+            {inspectionData.inspection_TO !== "" && (
               <h6 className="font-monts text-sm font-semibold text-darkerGray">
                 Travel/Office Order No.:{" "}
                 <a
@@ -446,8 +490,23 @@ export default function Page({ params }: { params: { id: string } }) {
                   {extractFilenameFromFirebaseURL(inspectionData.inspection_TO)}
                 </a>
               </h6>
-            </div>
-          )}
+            )}
+            {inspectionData.inspection_COC !== "" && (
+              <h6 className="font-monts text-sm font-semibold text-darkerGray">
+                Certificate of Compliance is valid until{" "}
+                {
+                  //Add 5 years to the fulfilledAt date
+                  formatDateToDash(
+                    new Date(
+                      new Date(inspectionData.fulfilledAt).setFullYear(
+                        new Date(inspectionData.fulfilledAt).getFullYear() + 5
+                      )
+                    )
+                  )
+                }
+              </h6>
+            )}
+          </div>
         </div>
 
         {/* If inspection data is scheduling and if a cancellation/rescheduling request is already ongoing, dont show the btns */}
@@ -499,8 +558,14 @@ export default function Page({ params }: { params: { id: string } }) {
             decision={handleScheduleApproval}
             isLoading={isLoading}
           />
-        ) : task.includes("imwpr") ? (
-          <IMWPR />
+        ) : //Check if inspection date is on or after today and if the task contains imwpr
+        new Date().getTime() -
+            new Date(inspectionData.inspection_date).getTime() >=
+            0 && task.includes("imwpr") ? (
+          <IMWPRTask
+            handleIMWPRSubmission={handleIMWPRSubmission}
+            isLoading={isLoading}
+          />
         ) : task.includes("for nim") ? (
           <NIM
             inspectionDetails={inspectionData}
@@ -515,6 +580,10 @@ export default function Page({ params }: { params: { id: string } }) {
             client_email={inspectionData.client_details.email}
             setIsLoading={setIsLoading}
           />
+        ) : task.includes("finished") ? (
+          <>
+            <InspectionSummary inspectionDetails={inspectionData} />
+          </>
         ) : (
           <PendingWaiting task={task} />
         )}

@@ -103,19 +103,21 @@ export default function CheckRequirements({
               </div>
               <ul className="list-none py-2 border-b w-full">
                 <li>{requirementTexts[requirement]}</li>
-                {requirements[requirement].map((link: string) => {
-                  return (
-                    <li>
-                      <a
-                        href={link}
-                        target="_blank"
-                        className="text-primaryBlue hover:underline"
-                      >
-                        Download file ({extractFilenameFromFirebaseURL(link)})
-                      </a>
-                    </li>
-                  );
-                })}
+                {requirements[requirement].map(
+                  (link: string, index: number) => {
+                    return (
+                      <li key={index}>
+                        <a
+                          href={link}
+                          target="_blank"
+                          className="text-primaryBlue hover:underline"
+                        >
+                          Download file ({extractFilenameFromFirebaseURL(link)})
+                        </a>
+                      </li>
+                    );
+                  }
+                )}
               </ul>
             </li>
           ))}

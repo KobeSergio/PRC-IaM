@@ -33,6 +33,11 @@ export default function PendingWaiting({ task }: any) {
     taskContent = "Waiting for the travel order to be uploaded by the ACD";
   }
 
+  if (task.toLowerCase().includes("for coc")) {
+    taskContent =
+      "Nothing to do here. Accomplish post-inspection tasks after the inspection is done.";
+  }
+
   return (
     <div className="h-fit lg:h-[45vh] bg-white border border-[#D5D7D8] flex flex-col rounded-[10px] p-6 gap-2">
       <h1 className="font-monts font-bold text-lg text-darkerGray underline">
