@@ -15,8 +15,11 @@ ChartJS.register(ArcElement);
 
 import { useInspections } from "@/contexts/InspectionContext";
 import { Inspection } from "@/types/Inspection";
+import { useRouter } from "next/navigation";
 
 export default function InspectionCalendar() {
+  const { push } = useRouter();
+
   const [showFilterModal, setShowFilterModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
@@ -120,9 +123,9 @@ export default function InspectionCalendar() {
     ],
   } as any);
 
+  //Pie chart data
   useEffect(() => {
     if (inspections.length == 0) return;
-
     //Get number of inspections where inspection_status is reschedulled, cancelled, random, approved, additional, non-compliant, for compliance, compliant, and under review from inspections object
     const rescheduledInspections = inspections.filter(
       (inspection) => inspection.status == "Rescheduled"
@@ -185,6 +188,7 @@ export default function InspectionCalendar() {
     });
   }, [inspections]);
 
+  //Disable scrolling when filter modal is open
   useEffect(() => {
     const body = document.querySelector("body");
     if (showFilterModal) {
@@ -196,8 +200,7 @@ export default function InspectionCalendar() {
 
   //Calendar handler
   const handleEventClick = (arg: any) => {
-    // bind with an arrow function
-    alert(arg.dateStr);
+    push("/inspection/" + arg.event.id);
   };
 
   return (
@@ -274,10 +277,20 @@ export default function InspectionCalendar() {
             <div className="bg-white p-4 rounded-lg">
               <FullCalendar
                 plugins={[dayGridPlugin, interactionPlugin]}
+                viewClassNames={["font-monts font-semibold text-sm"]}
+                eventClassNames={["px-2 cursor-pointer "]}
+                weekNumberClassNames={["font-monts font-semibold text-sm"]}
                 initialView="dayGridMonth"
                 eventClick={handleEventClick}
                 selectable={true}
-                events={[{ title: "event 1", date: "2023-09-01" }]}
+                events={filteredInspections.map((inspection: Inspection) => {
+                  return {
+                    title: inspection.client_details.name,
+                    date: inspection.inspection_date,
+                    id: inspection.inspection_id,
+                    allDay: true,
+                  };
+                })}
               />
             </div>
           </div>

@@ -492,7 +492,11 @@ export default function Page({ params }: { params: { id: string } }) {
               </h6>
             )}
             {inspectionData.inspection_COC !== "" && (
-              <h6 className="font-monts text-sm font-semibold text-darkerGray">
+              <a
+                href={inspectionData.inspection_COC}
+                target="_blank"
+                className="font-monts text-sm font-semibold text-primaryBlue underline"
+              >
                 Certificate of Compliance is valid until{" "}
                 {
                   //Add 5 years to the fulfilledAt date
@@ -504,7 +508,7 @@ export default function Page({ params }: { params: { id: string } }) {
                     )
                   )
                 }
-              </h6>
+              </a>
             )}
           </div>
         </div>

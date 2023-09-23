@@ -137,7 +137,7 @@ export default function NIM({
     setIsLoading(false);
   };
   return (
-    <div className="h-full bg-white border border-[#D5D7D8] flex flex-col rounded-[10px] p-6 gap-2">
+    <div className="h-full w-full bg-white border border-[#D5D7D8] flex flex-col rounded-[10px] p-6 gap-2">
       <h1 className="font-monts font-bold text-lg text-darkerGray underline">
         Inspection Task - NIM
       </h1>
