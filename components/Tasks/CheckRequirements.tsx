@@ -8,12 +8,14 @@ export default function CheckRequirements({
   handleCheckRequirements,
   isLoading,
   client_email,
+  prb_email,
   setIsLoading,
 }: {
   requirements: any;
   handleCheckRequirements: (decision: Number) => void;
   isLoading: boolean;
   client_email: string;
+  prb_email: string;
   setIsLoading: any;
 }) {
   const [checkList, setCheckList] = useState({});
@@ -62,9 +64,10 @@ export default function CheckRequirements({
         formData.append("subject", "Missing Requirements");
         formData.append(
           "text",
-          `Good day! We have received your request for inspection. However, we noticed that you have not submitted the following requirements: ${missingRequirementsText.join(
+          `Good day! We have received your request for inspection. \n\nHowever, we noticed that you have not submitted the following requirements: \n${missingRequirementsText.join(
             ", "
-          )}. Please submit them as soon as possible. Thank you!`
+          )}. 
+          \n\n Please submit them as soon as possible to this email: ${prb_email}. \n\nThank you!`
         );
         formData.append("to", client_email);
 

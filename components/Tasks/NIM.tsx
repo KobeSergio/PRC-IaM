@@ -92,7 +92,7 @@ export default function NIM({
          return `\n- ${requirementTexts[key]}`;
        })}
      
-       Submission Link: https://<link_to_prcclient>/NIM/${expiring_link_id}
+       Submission Link: https://prc-iam-client.vercel.app/NIM/${expiring_link_id}
        
        Please be reminded that the link will expire in 7 days. Make sure to fulfill the requirements before the link expires. Failure to comply with the requirements will result in the cancellation of the inspection.
  
@@ -116,8 +116,7 @@ export default function NIM({
       //Update the inspection document in firebase
       await firebase.updateInspection(newInspection);
 
-      //Create log
-
+      //Create log 
       const log: Log = {
         log_id: "",
         timestamp: new Date().toLocaleString(),

@@ -583,6 +583,7 @@ export default function Page({ params }: { params: { id: string } }) {
             isLoading={isLoading}
             client_email={inspectionData.client_details.email}
             setIsLoading={setIsLoading}
+            prb_email={inspectionData.prb_details.email}
           />
         ) : task.includes("finished") ? (
           <>
