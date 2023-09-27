@@ -29,10 +29,10 @@ export default function ReschedulingRequest({
         return;
       }
     } else {
-      //If the set inspection date is less than 40 days, return
+      //If the set inspection date is less than 45 working days, return
       if (dayDifference < 40) {
         alert(
-          "Date is too soon. Allot more than 40 days for the inspection. Please pick another date."
+          "Date is too soon. Allot more than 45 working days for the inspection. Please pick another date."
         );
         return;
       }

@@ -27,7 +27,7 @@ export default function Nav() {
               <div className="flex flex-row gap-3 items-center">
                 <Link href="/">
                   <Image
-                    src={"assets/images/prc_logo.svg"}
+                    src={"/assets/images/prc_logo.svg"}
                     width={58}
                     height={58}
                     alt={"PRC Logo"}
@@ -41,7 +41,7 @@ export default function Nav() {
               <div className="lg:hidden">
                 <Image
                   src={
-                    toggle ? "assets/icons/close.svg" : "assets/icons/menu.svg"
+                    toggle ? "/assets/icons/close.svg" : "/assets/icons/menu.svg"
                   }
                   width={20}
                   height={20}

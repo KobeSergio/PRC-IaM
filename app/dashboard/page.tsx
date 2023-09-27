@@ -430,7 +430,7 @@ export default function Dashboard() {
                         </h3>
                         <h3 className=" col-span-2 font-monts font-semibold text-sm text-center text-darkerGray px-4">
                           {
-                            row.inspection_task.includes("IMPWR")
+                            row.inspection_task.includes("IMWPR")
                               ? "For IMWPR"
                               : row.inspection_task
                                   .replace(/<[^>]+>/g, "")

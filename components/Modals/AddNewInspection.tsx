@@ -179,15 +179,18 @@ export default function AddNewInspection({
       author_id: "",
     };
 
-    const inspection_status = await firebase.createInspection(inspection);
+    const newInspection = await firebase.createInspection(inspection);
     const log_status = await firebase.createLog(log, prb.prb_id);
 
-    if (inspection_status.status !== 200 || log_status.status !== 200) {
+    if (newInspection.status !== 200 || log_status.status !== 200) {
       alert("Something went wrong, please try again");
       setIsSubmitting(false);
       setter(false);
       return;
     }
+
+    inspection.inspection_id = newInspection.inspection_id as string;
+
     updateInspections((prev: Inspection[]) => [...prev, inspection]);
     alert("Inspection created successfully!");
 

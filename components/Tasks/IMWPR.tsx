@@ -106,8 +106,8 @@ export default function IMWPR({
   const [otherComments, setOtherComments] = useState("");
   const [recommendations, setRecommendations] = useState("");
   const [complianceDecision, setComplianceDecision] = useState<
-    "compliant" | "for-compliance" | "non-compliant"
-  >("non-compliant");
+    "Compliant" | "For-compliance" | "Non-compliant"
+  >("Non-compliant");
 
   const onSubmit = async () => {
     if (
@@ -349,8 +349,8 @@ export default function IMWPR({
                   name={`item_compliance_forIssuance`}
                   id="compliance"
                   type="radio"
-                  checked={complianceDecision === "compliant"}
-                  onChange={() => setComplianceDecision("compliant")}
+                  checked={complianceDecision === "Compliant"}
+                  onChange={() => setComplianceDecision("Compliant")}
                   className="w-4 h-4 accent-primaryBlue"
                 />
                 <label
@@ -364,8 +364,8 @@ export default function IMWPR({
                 <input
                   id="monitoring"
                   type="radio"
-                  checked={complianceDecision === "for-compliance"}
-                  onChange={() => setComplianceDecision("for-compliance")}
+                  checked={complianceDecision === "For-compliance"}
+                  onChange={() => setComplianceDecision("For-compliance")}
                   className="w-4 h-4 accent-primaryBlue"
                 />
                 <label
@@ -379,8 +379,8 @@ export default function IMWPR({
                 <input
                   id="non-compliant"
                   type="radio"
-                  checked={complianceDecision === "non-compliant"}
-                  onChange={() => setComplianceDecision("non-compliant")}
+                  checked={complianceDecision === "Non-compliant"}
+                  onChange={() => setComplianceDecision("Non-compliant")}
                   className="w-4 h-4 accent-primaryBlue"
                 />
                 <label
@@ -405,10 +405,10 @@ export default function IMWPR({
             {isLoading ? (
               <>
                 <Spinner />
-                Uploading...
+                Submitting...
               </>
             ) : (
-              "Upload IMWPR"
+              "Submit"
             )}
           </button>
         </div>

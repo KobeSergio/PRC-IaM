@@ -74,7 +74,6 @@ export default function Sections({
                         updateCompliance(sectionId, item.id, option.value)
                       }
                     />
-
                     {option.text}
                   </label>
                 ))}
