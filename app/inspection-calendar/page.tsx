@@ -448,7 +448,8 @@ export default function InspectionCalendar() {
                 <h3 className="col-span-1 font-monts font-semibold text-sm text-center text-[#5C5C5C] px-4 pr-0">
                   {""}
                 </h3>
-              </div> 
+              </div>
+
               <div className="lg:overflow-y-auto w-full max-h-[25rem]">
                 {filteredInspections.length == 0 ? (
                   <div className="flex justify-center items-center p-6">
