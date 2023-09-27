@@ -10,12 +10,7 @@ import { useEffect, useState } from "react";
 import Firebase from "@/lib/firebase";
 import { LogContext } from "@/contexts/LogContext";
 import { Log } from "@/types/Log";
-
-export const metadata = {
-  title: "PRC Inspection and Monitoring System",
-  description: "",
-};
-
+import { SessionProvider } from "next-auth/react";
 const firebase = new Firebase();
 
 type InspectionProviderProps = {
@@ -26,15 +21,7 @@ export const InspectionProvider: React.FC<InspectionProviderProps> = ({
   children,
 }) => {
   //Declare contexts here (Inspections and prb from local storage)
-  const [prb, setPrb] = useState("");
   const [inspections, setInspections] = useState<Inspection[]>([]);
-
-  useEffect(() => {
-    const prb = localStorage.getItem("prb");
-    if (prb) {
-      setPrb(JSON.parse(prb));
-    }
-  }, []);
 
   useEffect(() => {
     if (inspections.length == 0) {
@@ -50,7 +37,7 @@ export const InspectionProvider: React.FC<InspectionProviderProps> = ({
   }, []);
 
   return (
-    <InspectionContext.Provider value={{ prb, inspections, setInspections }}>
+    <InspectionContext.Provider value={{ inspections, setInspections }}>
       {children}
     </InspectionContext.Provider>
   );
@@ -93,14 +80,18 @@ export default function RootLayout({
   const pathname = usePathname();
   return (
     <html lang="en">
+      <link rel="icon" href="/assets/icons/favicon.svg" sizes="any" />
+      <title>PRC Inspection and Monitoring System</title>
       <body>
-        <InspectionProvider>
-          <LogProvider>
-            {pathname !== "/" && <Nav />}
-            <main className="">{children}</main>
-            {pathname !== "/" && <Footer />}
-          </LogProvider>
-        </InspectionProvider>
+        <SessionProvider>
+          <InspectionProvider>
+            <LogProvider>
+              {pathname !== "/" && <Nav />}
+              <main className="">{children}</main>
+              {pathname !== "/" && <Footer />}
+            </LogProvider>
+          </InspectionProvider>
+        </SessionProvider>
       </body>
     </html>
   );

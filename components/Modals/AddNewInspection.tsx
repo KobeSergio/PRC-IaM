@@ -1,4 +1,4 @@
-import Spinner from "@/components/Spinner";
+import { Spinner } from "@/components/Spinner";
 import React, { useEffect, useState } from "react";
 import { BsPencil, BsX } from "react-icons/bs";
 import { RiArrowDownSFill, RiSearchLine } from "react-icons/ri";
@@ -11,6 +11,7 @@ import { ACD } from "@/types/ACD";
 import { OC } from "@/types/OC";
 import { PRB } from "@/types/PRB";
 import { Log } from "@/types/Log";
+import { useSession } from "next-auth/react";
 
 export default function AddNewInspection({
   isOpen,
@@ -18,6 +19,7 @@ export default function AddNewInspection({
   updateInspections,
 }: any) {
   const firebase = new Firebase();
+  const { data }: any = useSession();
 
   //Loaders
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -31,6 +33,8 @@ export default function AddNewInspection({
   const [date, setDate] = useState("");
   const [mode, setMode] = useState("Virtual");
   const [RO, setRO] = useState("");
+  const [OC, setOC] = useState<OC>({} as OC);
+  const [ACD, setACD] = useState<ACD>({} as ACD);
   const [client, setClient] = useState("New client");
 
   //New client form values
@@ -50,6 +54,16 @@ export default function AddNewInspection({
         .catch((err) => {
           console.log(err);
         });
+
+      firebase.getOneACD().then((res) => {
+        if (res == null) return;
+        setACD(res);
+      });
+
+      firebase.getOneOC().then((res) => {
+        if (res == null) return;
+        setOC(res);
+      });
     }
 
     if (clientList.length == 0) {
@@ -64,10 +78,47 @@ export default function AddNewInspection({
     }
   }, [isOpen]);
 
+  const handleDate = async (e: any) => {
+    const selectedDate = new Date(e.target.value).getTime();
+    const today = new Date().getTime();
+    const timeDifference = selectedDate - today;
+    const dayDifference = Math.ceil(timeDifference / (1000 * 60 * 60 * 24));
+    //If date is not in the current year, check if the current date is from January 1 to June 29, if yes, accept the date, if not, reject the date
+    if (e.target.value.split("-")[0] != new Date().getFullYear().toString()) {
+      const currentDate = new Date();
+      if (
+        currentDate.getMonth() >= 6 &&
+        currentDate.getDate() >= 1 &&
+        currentDate.getDate() <= 29
+      ) {
+        alert("Inspection dates for succeeding year is not yet open");
+        return;
+      }
+    } else {
+      //If the set inspection date is less than 40 days, return
+      if (dayDifference < 40) {
+        alert(
+          "Date is too soon. Allot more than 40 days for the inspection. Please pick another date."
+        );
+        return;
+      }
+      if (
+        !confirm(
+          "Are you sure you want to schedule an additional inspection for this year?"
+        )
+      ) {
+        return;
+      }
+    }
+    setDate(e.target.value);
+  };
+
   //Handle form submission
   const handleSubmit = async () => {
-    //Get prb details from local_storage
-    const prb = JSON.parse(localStorage.getItem("prb") as string) as PRB;
+    if (!data) return;
+
+    const user = data as any;
+    const prb = (await firebase.getPRBDetails(user.prb_id)) as PRB;
     if (prb === null || prb === undefined) {
       alert("Something went wrong, please re-login and try again");
       return;
@@ -111,9 +162,11 @@ export default function AddNewInspection({
       client_details: newClient as Client,
       ro_details: regionalOffices.find((r) => r.ro_id == RO) as RO,
       prb_details: prb,
-      acd_details: {} as ACD,
-      oc_details: {} as OC,
+      //Get first ACD and OC
+      acd_details: ACD,
+      oc_details: OC,
       status: "Pending",
+      requirements: {},
     };
 
     const log: Log = {
@@ -132,6 +185,7 @@ export default function AddNewInspection({
     if (inspection_status.status !== 200 || log_status.status !== 200) {
       alert("Something went wrong, please try again");
       setIsSubmitting(false);
+      setter(false);
       return;
     }
     updateInspections((prev: Inspection[]) => [...prev, inspection]);
@@ -189,7 +243,7 @@ export default function AddNewInspection({
                       aria-label="date"
                       type="date"
                       className="block cursor-pointer appearance-none w-full text-gray border bg-white border-[#D5D7D8] rounded-lg font-monts font-medium text-sm text-[#7C7C7C] h-fit p-2.5 pr-6 outline-none"
-                      onChange={(e) => setDate(e.target.value)}
+                      onChange={handleDate}
                       value={date}
                     />
                   </div>

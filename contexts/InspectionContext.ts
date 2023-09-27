@@ -5,7 +5,6 @@ export const InspectionContext = createContext<
   | {
       inspections: Inspection[];
       setInspections: React.Dispatch<React.SetStateAction<Inspection[]>>;
-      prb: string;
     }
   | undefined
 >(undefined);

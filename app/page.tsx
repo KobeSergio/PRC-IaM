@@ -4,7 +4,8 @@ import Image from "next/image";
 import { useState } from "react";
 import Firebase from "@/lib/firebase";
 import { useRouter } from "next/navigation";
-import Spinner from "@/components/Spinner";
+import {Spinner} from "@/components/Spinner";
+import { signIn } from "next-auth/react";
 const firebase = new Firebase();
 
 export default function SignIn() {
@@ -23,23 +24,26 @@ export default function SignIn() {
 
   const handleSubmit = async (event: any) => {
     event.preventDefault();
-    if (email && password) {
+    if (email !== "" && password !== "") {
       setIsLoading(true);
-      const response = await firebase.signIn(email, password);
-      if (response.status === 200) {
-        //set token to local storage
-        if (response.prb !== undefined) {
-          //set token to local storage
-          localStorage.setItem("prb", JSON.stringify(response.prb));
+
+      try {
+        const res = await signIn("credentials", {
+          email: email,
+          password: password,
+          redirect: false,
+          callbackUrl: "/dashboard",
+        });
+
+        if (res !== undefined && res.url !== null) {
+          router.push(res.url);
+          return;
         }
-        //redirect to dashboard
-        router.push("/dashboard");
-        setIsLoading(false);
-      } else if (response.status === 401 || response.status === 400) {
         alert("Invalid credentials");
-      } else if (response.status === 500) {
-        alert("Something went wrong");
+      } catch (error) {
+        console.log(error);
       }
+
       setIsLoading(false);
     }
   };

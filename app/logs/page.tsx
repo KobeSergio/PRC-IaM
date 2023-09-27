@@ -116,7 +116,7 @@ export default function Logs() {
         );
       } else {
         const searchFilteredLogs = filteredLogs.filter((log) =>
-          log.author_details.name.toLowerCase().includes(search)
+          log.author_details.name.toLowerCase().includes(search.toLowerCase())
         );
         setFilteredLogs(searchFilteredLogs);
       }
@@ -258,6 +258,7 @@ export default function Logs() {
                         {row.client_details.name}
                       </h3>
                       <h3 className=" col-span-2 font-monts font-semibold text-sm text-start text-darkerGray px-4">
+                        {row.author_type.toUpperCase()}:{" "}
                         {row.author_details.hasOwnProperty("name")
                           ? row.author_details.name
                           : row.author_details.director}

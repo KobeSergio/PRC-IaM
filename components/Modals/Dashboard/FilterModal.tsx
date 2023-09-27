@@ -1,4 +1,4 @@
-import Spinner from "@/components/Spinner";
+import {Spinner} from "@/components/Spinner";
 import { Inspection } from "@/types/Inspection";
 import React, { useState } from "react";
 
@@ -41,10 +41,10 @@ export default function FilterModal({
         (checkboxState.blended && inspection.inspection_mode === "Blended") ||
         (checkboxState.virtual && inspection.inspection_mode === "Virtual") ||
         (checkboxState.scheduling &&
-          inspection.inspection_task === "Scheduling - PRB") ||
-        (checkboxState.NIM && inspection.inspection_task === "NIM") ||
-        (checkboxState.VS && inspection.inspection_task === "VS") ||
-        (checkboxState.IMWPR && inspection.inspection_task === "IMWPR")
+          inspection.inspection_task.includes("Scheduling - PRB")) ||
+        (checkboxState.NIM && inspection.inspection_task.includes("NIM")) ||
+        (checkboxState.VS && inspection.inspection_task.includes("VS")) ||
+        (checkboxState.IMWPR && inspection.inspection_task.includes("IMWPR"))
       ) {
         return true;
       }

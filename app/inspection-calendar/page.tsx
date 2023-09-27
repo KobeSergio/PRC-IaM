@@ -8,12 +8,18 @@ import { Pie } from "react-chartjs-2";
 import { RiArrowDownSFill, RiSearchLine } from "react-icons/ri";
 import { BsFunnel, BsCalendar3, BsPlusLg, BsList } from "react-icons/bs";
 import FilterModal from "@/components/Modals/InspectionCalendar/FilterModal";
+import FullCalendar from "@fullcalendar/react";
+import dayGridPlugin from "@fullcalendar/daygrid"; // a plugin!
+import interactionPlugin from "@fullcalendar/interaction"; // needed for dayClick
 ChartJS.register(ArcElement);
 
 import { useInspections } from "@/contexts/InspectionContext";
 import { Inspection } from "@/types/Inspection";
+import { useRouter } from "next/navigation";
 
 export default function InspectionCalendar() {
+  const { push } = useRouter();
+
   const [showFilterModal, setShowFilterModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showCalendar, setShowCalendar] = useState(false);
@@ -24,8 +30,19 @@ export default function InspectionCalendar() {
     useState<Inspection[]>(inspections);
   //Year sorter
   const currentYear = new Date().getFullYear();
-  const [selectedYear, setSelectedYear] = useState("All" as any); // Default to current year
+  const [selectedYear, setSelectedYear] = useState(currentYear as any); // Default to current year
   const [years, setYears] = useState([currentYear]);
+
+  useEffect(() => {
+    if (inspections.length > 0 && filteredInspections.length == 0)
+      setFilteredInspections(
+        inspections.filter(
+          (inspection) =>
+            new Date(inspection.inspection_date).getFullYear() ==
+            parseInt(selectedYear)
+        )
+      );
+  }, [inspections]);
 
   //Handler for year filter
   useEffect(() => {
@@ -69,8 +86,12 @@ export default function InspectionCalendar() {
       } else {
         const searchFilteredInspections = filteredInspections.filter(
           (inspection) =>
-            inspection.client_details.name.toLowerCase().includes(search)
+            inspection.client_details.name
+              .toLowerCase()
+              .includes(search.toLowerCase())
         );
+        console.log(searchFilteredInspections);
+
         setFilteredInspections(searchFilteredInspections);
       }
     }
@@ -102,9 +123,9 @@ export default function InspectionCalendar() {
     ],
   } as any);
 
+  //Pie chart data
   useEffect(() => {
     if (inspections.length == 0) return;
-
     //Get number of inspections where inspection_status is reschedulled, cancelled, random, approved, additional, non-compliant, for compliance, compliant, and under review from inspections object
     const rescheduledInspections = inspections.filter(
       (inspection) => inspection.status == "Rescheduled"
@@ -167,6 +188,7 @@ export default function InspectionCalendar() {
     });
   }, [inspections]);
 
+  //Disable scrolling when filter modal is open
   useEffect(() => {
     const body = document.querySelector("body");
     if (showFilterModal) {
@@ -176,13 +198,22 @@ export default function InspectionCalendar() {
     }
   }, [showFilterModal]);
 
+  //Calendar handler
+  const handleEventClick = (arg: any) => {
+    push("/inspection/" + arg.event.id);
+  };
+
   return (
     <>
       <FilterModal
         isOpen={showFilterModal}
         setter={() => setShowFilterModal(false)}
         isLoading={isLoading}
-        inspections={inspections}
+        inspections={inspections.filter(
+          (inspection) =>
+            new Date(inspection.inspection_date).getFullYear() ==
+            parseInt(selectedYear)
+        )}
         setFilteredInspections={setFilteredInspections}
       />
       <div className="min-h-[75vh] flex flex-col lg:flex-row gap-5">
@@ -216,10 +247,8 @@ export default function InspectionCalendar() {
                   <RiSearchLine className="absolute left-3 fill-[#7C7C7C]" />
                   <input
                     type="text"
-                    id="worker-search"
                     className="pl-10 p-2.5 outline-none bg-white border border-[#D5D7D8] rounded-lg font-monts font-medium text-sm text-gray text-inherit flex w-full"
                     placeholder="Search for a client"
-                    onChange={(e) => setSearch(e.target.value)}
                   />
                 </div>
                 <div className="">
@@ -245,7 +274,25 @@ export default function InspectionCalendar() {
                 </button>
               </div>
             </div>
-            <div>insert calendar here</div>
+            <div className="bg-white p-4 rounded-lg">
+              <FullCalendar
+                plugins={[dayGridPlugin, interactionPlugin]}
+                viewClassNames={["font-monts font-semibold text-sm"]}
+                eventClassNames={["px-2 cursor-pointer "]}
+                weekNumberClassNames={["font-monts font-semibold text-sm"]}
+                initialView="dayGridMonth"
+                eventClick={handleEventClick}
+                selectable={true}
+                events={filteredInspections.map((inspection: Inspection) => {
+                  return {
+                    title: inspection.client_details.name,
+                    date: inspection.inspection_date,
+                    id: inspection.inspection_id,
+                    allDay: true,
+                  };
+                })}
+              />
+            </div>
           </div>
         ) : (
           // List Section
@@ -356,6 +403,8 @@ export default function InspectionCalendar() {
                     id="worker-search"
                     className="pl-10 p-2.5 outline-none bg-white border border-[#D5D7D8] rounded-lg font-monts font-medium text-sm text-gray text-inherit flex w-full"
                     placeholder="Search for a client"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
                   />
                 </div>
                 <div className="">
@@ -406,7 +455,7 @@ export default function InspectionCalendar() {
                 </h3>
               </div>
 
-              <div className="lg:overflow-y-auto flex flex-col w-full max-h-[25rem] justify-center items-center">
+              <div className="lg:overflow-y-auto w-full max-h-[25rem] justify-center items-center flex flex-col">
                 {filteredInspections.length == 0 ? (
                   <div className="flex justify-center items-center p-6">
                     <h3 className="font-monts font-medium text-base text-center text-darkerGray">

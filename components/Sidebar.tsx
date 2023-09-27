@@ -2,10 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { useState, useEffect } from "react";
-import { BsGrid, BsCalendar3, BsBook, BsBoxArrowInLeft} from "react-icons/bs";
+import { BsGrid, BsCalendar3, BsBook, BsBoxArrowInLeft } from "react-icons/bs";
 
 export default function Sidebar() {
+  const { data }: any = useSession();
   const [currentDate, setCurrentDate] = useState(new Date());
   const pathname = usePathname();
   const dateOptions = {
@@ -21,17 +23,17 @@ export default function Sidebar() {
   const content = [
     {
       title: "Dashboard",
-      icon: <BsGrid size={18}/>,
+      icon: <BsGrid size={18} />,
       route: "/dashboard",
     },
     {
       title: "Inspection Calendar",
-      icon: <BsCalendar3 size={18}/>,
+      icon: <BsCalendar3 size={18} />,
       route: "/inspection-calendar",
     },
     {
       title: "Logs",
-      icon: <BsBook size={18}/>,
+      icon: <BsBook size={18} />,
       route: "/logs",
     },
   ];
@@ -48,7 +50,7 @@ export default function Sidebar() {
   return (
     <div className="w-full min-h-full px-6 py-10 flex flex-col justify-start items-center bg-white border border-[#D5D7D8] rounded-[10px]">
       <h3 className="font-monts font-medium text-base text-darkerGray">
-        Welcome back, <span className="text-primaryBlue">PRB 1</span>
+        Welcome back, <span className="text-primaryBlue">{data?.name}</span>
       </h3>
       <div className="flex flex-col items-center mt-4">
         <h1 className="font-monts font-medium text-[32px] text-darkerGray">

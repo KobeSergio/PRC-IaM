@@ -1,4 +1,4 @@
-import Spinner from "@/components/Spinner";
+import {Spinner} from "@/components/Spinner";
 import { Client } from "@/types/Client";
 import React, { useState } from "react";
 
