@@ -35,7 +35,6 @@ export default function Dashboard() {
   const defaultInspections = inspections.filter(
     (inspection) =>
       inspection.inspection_task.includes("Scheduling - PRB") ||
-      inspection.inspection_task.includes("IMAT") ||
       inspection.inspection_task.includes("NIM") ||
       inspection.inspection_task.includes("Review Inspection Requirements") ||
       inspection.inspection_task.includes("IMWPR")
@@ -58,7 +57,6 @@ export default function Dashboard() {
         inspections.filter(
           (inspection) =>
             inspection.inspection_task.includes("Scheduling - PRB") ||
-            inspection.inspection_task.includes("IMAT") ||
             inspection.inspection_task.includes("NIM") ||
             inspection.inspection_task.includes(
               "Review Inspection Requirements"
@@ -175,7 +173,6 @@ export default function Dashboard() {
                 new Date(inspection.inspection_date).getFullYear() ==
                   (selectedYear == "All" ? true : parseInt(selectedYear)) &&
                 (inspection.inspection_task.includes("Scheduling - PRB") ||
-                  inspection.inspection_task.includes("IMAT") ||
                   inspection.inspection_task.includes("NIM") ||
                   inspection.inspection_task.includes(
                     "Review Inspection Requirements"
