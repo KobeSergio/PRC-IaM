@@ -83,14 +83,14 @@ export default function CheckRequirements({
   };
 
   return (
-    <div className="h-fit lg:h-[45vh] bg-white border border-[#D5D7D8] flex flex-col rounded-[10px] p-6 gap-2">
+    <div className="h-fit bg-white border border-[#D5D7D8] flex flex-col rounded-[10px] p-6 gap-2">
       <h1 className="font-monts font-bold text-lg text-darkerGray underline">
         Inspection Task - Check Requirements
       </h1>
       <h6 className="font-monts font-semibold text-sm text-darkerGray">
         Check the list of requirements that the client submitted below:
       </h6>
-      <div className="flex flex-col gap-5 h-fit items-start overflow-y-auto">
+      <div className="flex flex-col gap-5 h-fit items-start">
         <ul className="list-none gap-2 ml-8">
           <p className="text-sm font-semibold text-darkerGray font-monts">
             Compliant?
