@@ -125,7 +125,7 @@ export default function AddNewInspection({
     }
     setIsSubmitting(true);
     //Create new client if client == "New client"
-    let newClient = {};
+    let newClient: any = {};
     if (client == "New client") {
       //Create new client
       newClient = {
@@ -136,10 +136,14 @@ export default function AddNewInspection({
         address: newClientAddress,
       };
 
-      await firebase.createNewClient(newClient as Client).catch((error) => {
-        console.log(error);
-        alert("Client failed to create");
-      });
+      const newId = await firebase
+        .createNewClient(newClient as Client)
+        .catch((error) => {
+          console.log(error);
+          alert("Client failed to create");
+        });
+
+      newClient.client_id = newId;
     } else {
       //Get newClient details
       newClient = clientList.find((c) => c.name == client) as Client;

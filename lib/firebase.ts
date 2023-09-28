@@ -508,7 +508,7 @@ export default class Firebase {
       await updateDoc(docRef, {
         client_id: docRef.id,
       });
-      return { status: 200 };
+      return { status: 200, client_id: docRef.id };
     } catch (error) {
       console.log(error);
       return { status: 400 };
