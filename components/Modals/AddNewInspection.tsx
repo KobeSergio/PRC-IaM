@@ -178,7 +178,7 @@ export default function AddNewInspection({
       timestamp: new Date().toLocaleString(),
       client_details: newClient as Client,
       author_details: prb,
-      action: "Added new inspection for the year " + date.split("-")[2],
+      action: "Added new inspection for the year " + date.split("-")[0],
       author_type: "",
       author_id: "",
     };
