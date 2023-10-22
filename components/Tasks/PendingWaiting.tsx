@@ -33,9 +33,22 @@ export default function PendingWaiting({ task }: any) {
     taskContent = "Waiting for the travel order to be uploaded by the ACD";
   }
 
-  if (task.toLowerCase().includes("for coc")) {
+  if (task.toLowerCase().includes("imwpr")) {
     taskContent =
       "Nothing to do here. Accomplish post-inspection tasks after the inspection is done.";
+  }
+
+  if (
+    task.toLowerCase().includes("coc") ||
+    task.toLowerCase().includes("imat") ||
+    task.toLowerCase().includes("vs")
+  ) {
+    taskContent =
+      "Waiting for the ACD and RO to upload their post-inspection reports";
+  }
+
+  if (task.toLowerCase().includes("finished")) {
+    taskContent = "Waiting for the ACD to upload their post-inspection reports";
   }
 
   return (

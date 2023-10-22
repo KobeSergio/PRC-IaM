@@ -311,7 +311,7 @@ export default function Page({ params }: { params: { id: string } }) {
     setIsLoading(false);
   };
 
-  const handleIMWPRSubmission = async (IMWPR: any) => {
+  const handleIMWPRSubmission = async (IMWPR: IMWPR) => {
     setIsLoading(true);
     //1.) Create log
     let log: Log = {} as Log;
@@ -335,14 +335,14 @@ export default function Page({ params }: { params: { id: string } }) {
       inspection = {
         ...inspectionData,
         inspection_task: inspectionData.inspection_task.replace("IMWPR", ""),
-        inspection_IMWPR: IMWPR,
+        inspection_IMWPR: IMWPR as any,
         status: IMWPR.compliance_decision,
       };
     } else {
       inspection = {
         ...inspectionData,
         inspection_task: "Inspection Finished",
-        inspection_IMWPR: IMWPR,
+        inspection_IMWPR: IMWPR as any,
         status: IMWPR.compliance_decision,
       };
     }
@@ -503,7 +503,7 @@ export default function Page({ params }: { params: { id: string } }) {
                   formatDateToDash(
                     new Date(
                       new Date(inspectionData.fulfilledAt).setFullYear(
-                        new Date(inspectionData.fulfilledAt).getFullYear() + 5
+                        new Date(inspectionData.fulfilledAt).getFullYear() + 3
                       )
                     )
                   )

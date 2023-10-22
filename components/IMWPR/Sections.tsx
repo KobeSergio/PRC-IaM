@@ -80,6 +80,7 @@ export default function Sections({
               </div>
             </div>
             <textarea
+              title="Remarks and recommendations"
               rows={1}
               value={
                 //Find the remark of the selected answer based from the questionId

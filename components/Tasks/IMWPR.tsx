@@ -125,6 +125,7 @@ export default function IMWPR({
       recommendations: recommendations,
       compliance_decision: complianceDecision,
     };
+    
     handleIMWPRSubmission(IMWPR);
   };
 

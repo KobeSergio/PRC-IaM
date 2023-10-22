@@ -122,7 +122,7 @@ export default function NIM({
         timestamp: new Date().toLocaleString(),
         client_details: inspectionDetails.client_details as Client,
         author_details: inspectionDetails.prb_details,
-        action: "Sent NIM on" + new Date().toLocaleString(),
+        action: "Sent NIM on " + new Date().toLocaleString(),
         author_type: "",
         author_id: "",
       };

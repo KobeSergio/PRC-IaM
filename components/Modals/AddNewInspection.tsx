@@ -352,6 +352,7 @@ export default function AddNewInspection({
                         Name
                       </h6>
                       <input
+                        title="Name"
                         type="text"
                         className="block cursor-pointer appearance-none w-full text-gray border bg-white border-[#D5D7D8] rounded-lg font-monts font-medium text-sm text-[#7C7C7C] h-fit p-2.5 pr-6 outline-none"
                         onChange={(e) => setNewClientName(e.target.value)}
@@ -364,6 +365,7 @@ export default function AddNewInspection({
                       </h6>
                       <div className="w-full relative">
                         <select
+                          title="Type"
                           className="block cursor-pointer appearance-none w-full text-gray border bg-white border-[#D5D7D8] rounded-lg font-monts font-medium text-sm text-[#7C7C7C] h-fit p-2.5 pr-6 outline-none"
                           onChange={(e) => setNewClientType(e.target.value)}
                           value={newClientType}

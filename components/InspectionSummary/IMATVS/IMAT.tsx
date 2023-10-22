@@ -1,4 +1,4 @@
-import { RiArrowDownSFill } from "react-icons/ri"; 
+import { RiArrowDownSFill } from "react-icons/ri";
 import { IMAT } from "@/types/IMAT";
 import { BsCloudArrowDown } from "react-icons/bs";
 
@@ -22,6 +22,7 @@ export default function IMATVS({
               Name of the Authorized Representative:
             </h6>
             <input
+              title="Name of the Authorized Representative"
               type="text"
               value={IMATDetails.authorizedPersonnel}
               disabled
@@ -33,6 +34,7 @@ export default function IMATVS({
               Position:
             </h6>
             <input
+              title="Position"
               type="text"
               value={IMATDetails.position}
               disabled
@@ -79,6 +81,7 @@ export default function IMATVS({
                         Date of Validity:
                       </h6>
                       <input
+                        title="Date of Validity"
                         type="date"
                         disabled
                         value={registeredProfessional.dateOfValidity}
@@ -206,6 +209,7 @@ export default function IMATVS({
                       Name:
                     </h6>
                     <input
+                      title="Name"
                       type="text"
                       value={employee.name}
                       disabled
@@ -217,6 +221,7 @@ export default function IMATVS({
                       Qualifications/Credentials:
                     </h6>
                     <input
+                      title="Qualifications/Credentials"
                       type="text"
                       value={employee.qualifications}
                       disabled
@@ -228,6 +233,7 @@ export default function IMATVS({
                       Scope of work:
                     </h6>
                     <input
+                      title="Scope of work"
                       type="text"
                       value={employee.scopeOfWork}
                       disabled
@@ -239,6 +245,7 @@ export default function IMATVS({
                       Workload:
                     </h6>
                     <input
+                      title="Workload"
                       type="text"
                       value={employee.workload}
                       disabled
