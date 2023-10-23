@@ -143,7 +143,7 @@ export default function AddNewInspection({
           alert("Client failed to create");
         });
 
-      newClient.client_id = newId;
+      newClient.client_id = newId?.client_id;
     } else {
       //Get newClient details
       newClient = clientList.find((c) => c.name == client) as Client;
